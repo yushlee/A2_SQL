@@ -198,9 +198,10 @@ SELECT G.*, S.*
 FROM GEOGRAPHY G, STORE_INFORMATION S
 WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
 
--- 若未下WHERE JOIN 欄位關聯查詢，將會產生所有的資料排列組合的結果
 -- 區域:3
 -- 商店:9
+-- 若未下WHERE JOIN 欄位關聯查詢，將會產生所有的資料排列組合的結果
+-- 區域:3 * 商店:9 = 27筆
 SELECT G.*, S.* 
 FROM GEOGRAPHY G, STORE_INFORMATION S;
 
