@@ -120,4 +120,23 @@ ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 GROUP BY G.REGION_NAME
 ORDER BY COUNT(DISTINCT S.STORE_NAME) DESC;
 
+/*
+NUMBER( P, S )
+P：表示數字總共的位數
+S：表示小數的位數
+
+NUMBER(5, 2)
+表示數值共5位數(包含固定最多2位小數、故整數位最多只能為3碼數字)
+小數點第3位自動進位至第2位
+123.455 → 123.46
+
+NUMBER( 5, -2)
+表示數值共5位「整數」-2表示數值自動進位至百位數
+12355 → 12400
+*/
+
+
+
+
+
 
