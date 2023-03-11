@@ -197,6 +197,68 @@ CREATE TABLE Inventory(
 INSERT INTO Vendor (VENDORNUMERIC, NAME, ADDRESS, CITY, STREET, ZIPCODE, PHONENUMERIC, STATUS) VALUES ('1', 'Apple Inc', '大同區承德路一段1號1樓', '台北市', '承德路', '10351', '02 7743 8068', '營運中');
 INSERT INTO Inventory (ITEM, DESCRIPTION, CURRENTQUANTITY, VENDORNUMERIC) VALUES ('iPhone 7 Plus', 'iPhone 7 Plus 5.5吋手機 32GB(原廠包裝盒+原廠配件)', '10', '1');
 
+-- Many to Many 多對多關係(雙向一對多)
+-- A資料表中的多筆資料記錄同時可以對應到B資料表的多筆記錄
+-- 例如一位學生可以選擇多門課，一門課也可以同時被多位學生選擇
 
+-- 課程科目
+CREATE TABLE Class(
+    ClassID VARCHAR(20) PRIMARY KEY,
+    ClassName VARCHAR(300),
+    Instructor VARCHAR(100)
+);
 
+-- 學生
+CREATE TABLE Student(
+    StudentID VARCHAR(20) PRIMARY KEY,
+    Name VARCHAR(100),
+    Major VARCHAR(100),
+    ClassYear VARCHAR(50)
+);
+
+--
+-- UNIQUE (StudentID, ClassID)
+-- 表示一位學生只能選擇同樣的課程一次不得重覆
+CREATE TABLE ClassStudent_Relation(
+    StudentID VARCHAR(20) NOT NULL,
+    ClassID VARCHAR(20) NOT NULL,
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
+    UNIQUE (StudentID, ClassID)
+);
+
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('1', '國文', '朱媽');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('2', '數學', '凡清');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('3', '英文', '高國華');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('4', '理化', '阿飛');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('5', '物理', '簡杰');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('6', '歷史', '呂杰');
+INSERT INTO Class (ClassID, ClassNAME, INSTRUCTOR) VALUES ('7', '地理', '王剛');
+
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('1', '馬小九', '資訊管理', '大二');
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('2', '輸真慘', '資訊工程', '大一');
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('3', '菜英蚊', '企業管理', '大三');
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('4', '豬利輪', '財務金融', '大二');
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('5', '韓國魚', '應用外語', '碩二');
+INSERT INTO Student (StudentID, NAME, MAJOR, ClassYEAR) VALUES ('6', '賣臺銘', '國際貿易', '大一');
+
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('1', '1');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('1', '3');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('2', '1');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('3', '1');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('3', '2');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('3', '5');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('5', '6');
+INSERT INTO ClassStudent_Relation (StudentID, ClassID) VALUES ('6', '6');
+
+-- 資料操作語言 DML (Data Manipulation Language)
+-- 1.INSERT 新增資料到資料表中
+INSERT INTO store_information (STORE_ID, STORE_NAME, SALES, STORE_DATE, GEOGRAPHY_ID)
+	VALUES(10, 'AppleInc', 5600, '2023-03-11 00:00:00', 3);
+
+-- 2.UPDATE 更改資料表中的資料
+UPDATE store_information SET STORE_NAME ='HTC', SALES=1600 WHERE STORE_ID = 10;
+
+-- 3.DELETE 刪除資料表中的資料
+DELETE FROM store_information WHERE STORE_ID = 10;
 
