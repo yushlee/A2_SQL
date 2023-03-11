@@ -76,7 +76,7 @@ SELECT STORE_ID, STORE_NAME,
     TRIM(BOTH 'L' FROM STORE_NAME)
 FROM STORE_INFORMATION;
 
-
+-- SQL 練習題(二)
 -- 計算和統計「個別商店」的以下三項資料：
 -- 「總合營業額」、「商店資料個數」、「平均營業額」
 -- 搜尋或排除條件如下：
@@ -84,8 +84,23 @@ FROM STORE_INFORMATION;
 -- 排除「商店資料個數」1(含)個以下的商店資料
 -- 依照「平均營業額」由大至小排序
 -- PS:使用別名語法簡化「表格名稱」及查詢結果「欄位名稱」
-SELECT STORE_NAME, SUM(SALES)
+SELECT STORE_NAME, SUM(SALES) "SUM_SALES", 
+	COUNT(STORE_ID) "COUNT_STORE", AVG(SALES) "AVG_SALES"
 FROM STORE_INFORMATION
-GROUP BY STORE_NAME;
+GROUP BY STORE_NAME
+HAVING AVG(SALES) > 1000
+AND COUNT(STORE_ID) > 1
+ORDER BY AVG(SALES) DESC;
+
+
+-- SQL 練習題(三)
+-- 查詢各區域的營業額總計
+-- 資料結果依營業額總計由大到小排序
+-- (不論該區域底下是否有所屬商店)
+-- FROM GEOGRAPHY G FULL JOIN STORE_INFORMATION S
+SELECT G.*, S.* 
+FROM GEOGRAPHY G LEFT JOIN STORE_INFORMATION S
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+
 
 
