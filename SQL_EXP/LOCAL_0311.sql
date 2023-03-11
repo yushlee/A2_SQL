@@ -93,7 +93,7 @@ AND COUNT(STORE_ID) > 1
 ORDER BY AVG(SALES) DESC;
 
 
--- SQL 練習題(三)
+-- SQL 練習題(3-1)
 -- 查詢各區域的營業額總計
 -- 資料結果依營業額總計由大到小排序
 -- (不論該區域底下是否有所屬商店)
@@ -109,13 +109,15 @@ ORDER BY SUM(S.SALES) DESC;
 -- MySQL
 SELECT IFNULL(NULL, 'VALUE');
 
-
+-- SQL 練習題(3-2)
 -- 查詢各區域的商店個數
 -- 資料結果依區域的商店個數由大至小排序
 -- (依據商店名稱,不包含重覆的商店)
 -- (不論該區域底下是否有所屬商店)
-SELECT G.*, S.*
+SELECT G.REGION_NAME, COUNT(DISTINCT S.STORE_NAME) "STORE_COUNT"
 FROM GEOGRAPHY G LEFT JOIN STORE_INFORMATION S
 ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+GROUP BY G.REGION_NAME
+ORDER BY COUNT(DISTINCT S.STORE_NAME) DESC;
 
 
