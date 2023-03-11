@@ -135,7 +135,67 @@ NUMBER( 5, -2)
 12355 → 12400
 */
 
+/*
+1.主鍵 (Primary Key) 中的每一筆資料都是表格中的唯一值。
+2.主鍵可以包含一或多個欄位。當主鍵包含多個欄位時，稱為組合鍵 (Composite Key)。
+3.Primary Key不允許NULL、UNIQUE允許NULL
+*/
+/*
+外來鍵(Foreign Key)是一個(或數個)指向另外一個表格主鍵的欄位。
+外來鍵的目的是確定資料的參考完整性(referential integrity)
+*/
 
+-- One to One 一對一關係
+-- A資料表中的單筆資料記錄同時只能對應到B資料表的一筆記錄
+-- 政府官員州長
+CREATE TABLE Gov(
+    GID NUMERIC(3) PRIMARY KEY,
+    Name VARCHAR(25),
+    Address VARCHAR(30),
+    TermBegin date,
+    TermEnd date
+);
+
+-- 州
+-- REFERENCES(參照)、CONSTRAINT(限制)、UNIQUE(唯一)
+CREATE TABLE State(
+    SID NUMERIC(3) PRIMARY KEY,
+    StateName VARCHAR(15),
+    Population NUMERIC(10),
+    SGID NUMERIC(4),
+    CONSTRAINT CONSTRAINT_SGID_UNIQUE UNIQUE (SGID),
+	CONSTRAINT CONSTRAINT_FK_GOV_GID FOREIGN KEY (SGID) REFERENCES Gov(GID)
+);
+
+INSERT INTO Gov (GID, Name, Address, TermBegin, TERMEND) VALUES (110, 'Bob', '123 Any St', '2009-01-01', '2011-12-31');
+
+INSERT INTO State (SID, StateName, Population, SGID) VALUES (111, 'Virginia', 2000000, 110);
+
+-- One to Many 一對多關係
+-- A資料表中的單筆資料記錄同時可以對應到B資料表的多筆記錄
+-- 供應商
+CREATE TABLE Vendor(
+    VendorNUMERIC NUMERIC(4) PRIMARY KEY,
+    Name VARCHAR(20),
+    Address VARCHAR(200),
+    City VARCHAR(15),
+    Street VARCHAR(200),
+    ZipCode VARCHAR(10),
+    PhoneNUMERIC VARCHAR(12),
+    Status VARCHAR(50)
+);
+
+-- 商品清單
+CREATE TABLE Inventory(
+    Item VARCHAR(50) PRIMARY KEY,
+    Description VARCHAR(300),
+    CurrentQuantity NUMERIC(4) NOT NULL,
+    VendorNUMERIC NUMERIC(4),
+	CONSTRAINT CONSTRAINT_VENDOR_FK FOREIGN KEY (VendorNUMERIC) REFERENCES Vendor(VendorNUMERIC)
+);
+
+INSERT INTO Vendor (VENDORNUMERIC, NAME, ADDRESS, CITY, STREET, ZIPCODE, PHONENUMERIC, STATUS) VALUES ('1', 'Apple Inc', '大同區承德路一段1號1樓', '台北市', '承德路', '10351', '02 7743 8068', '營運中');
+INSERT INTO Inventory (ITEM, DESCRIPTION, CURRENTQUANTITY, VENDORNUMERIC) VALUES ('iPhone 7 Plus', 'iPhone 7 Plus 5.5吋手機 32GB(原廠包裝盒+原廠配件)', '10', '1');
 
 
 
