@@ -1,5 +1,5 @@
 INSERT INTO store_information (STORE_ID, STORE_NAME, SALES, STORE_DATE, GEOGRAPHY_ID)
-	VALUES(10, 'AppleInc', 5600, '2023-03-11 00:00:00', 3);
+	VALUES(10, 'AppleInc', 1000, '2023-03-11 00:00:00', 3);
     
 SELECT * FROM store_information;
 
@@ -62,8 +62,53 @@ FROM GEOGRAPHY G
 LEFT JOIN STORE_INFORMATION S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 WHERE S.GEOGRAPHY_ID IS NULL;
 
-
 -- SQL SubQuery 子查詢
+
+-- 找出營業額最高的商店資料
+-- 外查詢
+SELECT * 
+FROM STORE_INFORMATION
+WHERE SALES = (
+	-- 內查詢
+	SELECT MAX(SALES) FROM STORE_INFORMATION
+);
+
+-- 內部查詢本身與外部查詢沒有關係。
+-- 這一類的子查詢稱為『簡單子查詢』 (Simple Subquery)
+SELECT SUM(SALES)
+FROM STORE_INFORMATION
+WHERE GEOGRAPHY_ID IN (
+	-- 1,2,3
+	SELECT GEOGRAPHY_ID FROM GEOGRAPHY
+);
+
+-- 內部查詢是要利用到外部查詢提到的表格中的欄位，
+-- 那這個字查詢就被稱為『相關子查詢』(Correlated Subquery)
+-- 外查詢
+SELECT SUM(SALES)
+FROM STORE_INFORMATION S
+WHERE S.GEOGRAPHY_ID IN (
+	-- 內查詢
+	SELECT G.GEOGRAPHY_ID FROM GEOGRAPHY G
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+-- 『簡單子查詢』 (Simple Subquery)
+SELECT G.*, S.*
+FROM (
+   SELECT * FROM GEOGRAPHY
+) G , 
+(
+   SELECT *
+   FROM STORE_INFORMATION
+) S
+WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+
+
+
 -- SQL EXISTS 存在式關聯查詢
+
+
+
 -- SQL CASE WHEN 條件查詢
 
