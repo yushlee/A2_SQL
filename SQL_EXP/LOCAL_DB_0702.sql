@@ -73,6 +73,7 @@ FROM STORE_INFORMATION
 WHERE STORE_NAME LIKE 'L%s';
 
 /*
+SQL 練習題(一)
 1.「且」找出屬於西區的商店
 2.「且」營業額大於300(包含300)
 3.「且」商店名稱"L"開頭
