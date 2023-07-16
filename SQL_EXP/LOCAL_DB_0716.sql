@@ -44,6 +44,42 @@ ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
 
 
 -- SQL MINUS 排除(不包含重覆值) 
+/*
+ MINUS (Oracle)、EXCEPT (MS SQL)指令是運用在兩個 SQL 語句上
+它先找出第一個 SQL 語句所產生的結果，
+然後看這些結果「有沒有在第二個 SQL 語句的結果中」。
+如果「有」的話，那這一筆資料就被「去除」，而不會在最後的結果中出現。
+如果「沒有」的話，那這一筆資料就被「保留」，而就會在最後的結果中出現。
+請注意，在 MINUS 指令下，不同的值只會被列出一次。 
+*/
+
+-- MINUS(Oracle)
+/*
+-- 1,2,3
+SELECT GEOGRAPHY_ID FROM GEOGRAPHY
+MINUS
+-- null,1,2
+SELECT GEOGRAPHY_ID FROM STORE_INFORMATION;
+*/
+
+-- EXCEPT(MS SQL)
+/*
+-- 1,2,3
+SELECT GEOGRAPHY_ID FROM GEOGRAPHY
+EXCEPT
+-- null,1,2
+SELECT GEOGRAPHY_ID FROM STORE_INFORMATION;
+*/
+
+-- MySQL MINUS 替代寫法
+-- LEFT JOIN + table2.id IS NULL = MINUS
+-- LEFT JOIN - INNER JOIN
+SELECT G.GEOGRAPHY_ID
+FROM GEOGRAPHY G 
+LEFT JOIN STORE_INFORMATION S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+WHERE S.GEOGRAPHY_ID IS NULL;
+
+
 -- SQL SubQuery 子查詢
 -- SQL EXISTS 存在式關聯查詢
 -- SQL CASE WHEN 條件查詢
