@@ -74,6 +74,35 @@ LEFT JOIN store_information S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 WHERE S.GEOGRAPHY_ID IS NULL;
 
 --   SQL SubQuery 子查詢
+
+-- 『簡單子查詢』 (Simple Subquery)
+-- 營業額最高的商店
+-- 外查詢
+SELECT * FROM store_information
+WHERE SALES = (
+	-- 內查詢
+	SELECT MAX(SALES) FROM store_information
+);
+
+-- 『相關子查詢』(Correlated Subquery)
+-- 外查詢
+SELECT S.*
+FROM store_information S
+WHERE S.GEOGRAPHY_ID IN (
+	-- 內查詢
+	SELECT G.GEOGRAPHY_ID FROM geography G
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+SELECT G.*, S.*
+FROM (
+	SELECT GEOGRAPHY_ID, REGION_NAME FROM geography
+) G,
+(
+	SELECT STORE_ID, SALES, STORE_NAME, STORE_DATE, GEOGRAPHY_ID FROM store_information
+)S
+WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+
 --   SQL EXISTS 存在式關聯查詢
 --   SQL CASE WHEN 條件查詢
 
