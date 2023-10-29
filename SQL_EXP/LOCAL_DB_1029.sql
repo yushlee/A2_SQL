@@ -128,6 +128,29 @@ SELECT S.* FROM S;
 
 
 --   SQL EXISTS 存在式關聯查詢
+-- EXISTS 是用來測試「內查詢」有沒有產生任何結果。
+-- 如果有的話，系統就會執行「外查詢」中的 SQL。
+-- 若是沒有的話，那整個 SQL 語句就不會產生任何結果。
+
+-- 外查詢
+-- 13,250
+SELECT SUM(SALES) FROM store_information
+WHERE EXISTS (
+	-- 內查詢
+	SELECT GEOGRAPHY_ID,REGION_NAME FROM geography WHERE GEOGRAPHY_ID = 2
+);
+
+
+-- 外查詢
+-- 13,250
+SELECT SUM(SALES) FROM store_information S
+WHERE EXISTS (
+	-- 內查詢
+	SELECT GEOGRAPHY_ID,REGION_NAME FROM geography G
+    WHERE GEOGRAPHY_ID = 2
+    AND G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
 --   SQL CASE WHEN 條件查詢
 
 
