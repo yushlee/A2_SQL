@@ -4,9 +4,9 @@ WHERE S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 
 -- 內部連接
 -- INNER JOIN...ON
-SELECT S.*, G.* 
-FROM store_information S INNER JOIN geography G 
-ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
+SELECT G.*, S.*  
+FROM geography G INNER JOIN store_information S  
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
 
 
 SELECT G.*, S.*  
@@ -25,3 +25,27 @@ ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
 -- cross join
 SELECT S.*, G.* 
 FROM store_information S, geography G;
+
+SELECT G.*, S.*  
+FROM geography G  LEFT OUTER JOIN store_information S 
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+WHERE S.GEOGRAPHY_ID IS NULL;
+
+SELECT G.*, S.*  
+FROM geography G  RIGHT OUTER JOIN store_information S 
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+WHERE G.GEOGRAPHY_ID IS NULL;
+
+-- SELECT G.*, S.*  
+-- FROM geography G  FULL OUTER JOIN store_information S 
+-- ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+-- WHERE G.GEOGRAPHY_ID IS NULL OR S.GEOGRAPHY_ID IS NULL;
+
+-- SQL 練習題(三)
+-- 查詢各區域的營業額總計
+-- 資料結果依營業額總計由大到小排序
+-- (不論該區域底下是否有所屬商店)
+SELECT G.REGION_NAME, ?  
+FROM geography G  LEFT OUTER JOIN store_information S 
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+GROUP BY G.REGION_NAME;
