@@ -83,6 +83,67 @@ SELECT  G.*,S.*  FROM (
 ) S
 WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
 
+-- WITH (Common Table Expressions)
+WITH G AS (
+  SELECT GEOGRAPHY_ID, REGION_NAME FROM GEOGRAPHY
+)  ,
+S AS (
+  SELECT GEOGRAPHY_ID, STORE_NAME FROM STORE_INFORMATION
+)
+SELECT  G.*, S.*  FROM G, S 
+WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+
+-- EXISTS 是用來測試「內查詢」有沒有產生任何結果。
+-- 如果有的話，系統就會執行「外查詢」中的 SQL。
+-- 若是沒有的話，那整個 SQL 語句就不會產生任何結果。
+
+-- 簡單子查詢
+-- 外查詢
+SELECT S.* 
+FROM store_information S
+WHERE EXISTS (
+	-- 內查詢
+	SELECT * FROM geography G
+    WHERE G.GEOGRAPHY_ID = 1
+);
+
+-- EXISTS搭配關聯式子查詢
+-- 外查詢
+SELECT S.* 
+FROM store_information S
+WHERE EXISTS (
+	-- 內查詢
+	SELECT * FROM geography G
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+-- 外查詢
+SELECT S.* 
+FROM store_information S
+WHERE NOT EXISTS (
+	-- 內查詢
+	SELECT * FROM geography G
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+
+SELECT S.STORE_ID, S.STORE_NAME, S.SALES,
+	CASE S.STORE_NAME
+		WHEN 'Los Angeles' THEN S.SALES * 2
+		WHEN 'San Diego' THEN S.SALES * 1.5
+	ELSE SALES END NEW_SALES
+FROM store_information S;
+
+
+SELECT S.STORE_ID, S.STORE_NAME, S.SALES,
+	CASE
+		WHEN SALES BETWEEN 0 AND 1000 THEN '0-1000'
+		WHEN SALES BETWEEN 1001 AND 2000 THEN '1001-2000'
+        WHEN (SALES >= 2001 AND SALES <= 3000) THEN '2001-3000'
+        WHEN SALES > 3000 THEN '>3000'
+	 END SALES_RANGE
+FROM store_information S;
+
 
 
 
