@@ -49,6 +49,48 @@ FROM geography G LEFT JOIN store_information S
 ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 WHERE S.GEOGRAPHY_ID IS NULL;
 
+-- 最高營業額的商店資料
+SELECT *
+FROM store_information
+WHERE SALES = (
+	SELECT MAX(SALES) FROM store_information 
+);
+
+-- 簡單子查詢
+SELECT S.* 
+FROM store_information S
+WHERE S.GEOGRAPHY_ID IN (
+  SELECT G.GEOGRAPHY_ID FROM geography G
+);
+
+-- 相關子查詢
+-- 外查詢
+SELECT S.* 
+FROM store_information S
+WHERE S.GEOGRAPHY_ID IN (
+  -- 內查詢
+  SELECT G.GEOGRAPHY_ID FROM geography G
+  WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+
+SELECT  G.*,S.*  FROM (
+   SELECT GEOGRAPHY_ID, REGION_NAME FROM GEOGRAPHY
+) G , 
+(
+   SELECT GEOGRAPHY_ID, STORE_NAME 
+   FROM STORE_INFORMATION
+) S
+WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+
+
+
+
+	
+
+
+
+
 
 
 
