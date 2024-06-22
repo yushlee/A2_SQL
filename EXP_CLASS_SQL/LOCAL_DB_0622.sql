@@ -1,0 +1,90 @@
+SELECT  STORE_ID, SALES, STORE_NAME, STORE_DATE FROM store_information;
+
+SELECT * FROM store_information;
+
+-- 資料去重覆
+SELECT DISTINCT STORE_NAME FROM store_information;
+
+SELECT  STORE_ID, STORE_NAME, SALES 
+FROM store_information
+WHERE SALES >= 1500;
+
+-- 表格中選出所有 Sales 高於 $1,000 或是 Sales 在 $500 及 $275 之間的資料的話
+
+SELECT  STORE_ID, STORE_NAME, SALES 
+FROM store_information
+WHERE SALES > 1000
+OR (SALES > 275 AND SALES < 500);
+
+-- AND 嚴謹(資料限縮)
+-- OR 寬鬆(資料擴展)
+SELECT  STORE_ID, STORE_NAME, SALES, GEOGRAPHY_ID
+FROM store_information
+WHERE GEOGRAPHY_ID = 2
+AND SALES > 500;
+
+SELECT  STORE_ID, STORE_NAME, SALES, GEOGRAPHY_ID
+FROM store_information
+WHERE STORE_ID = 1
+OR STORE_ID = 2
+OR STORE_ID = 3;
+
+SELECT  STORE_ID, STORE_NAME, SALES, GEOGRAPHY_ID
+FROM store_information
+WHERE STORE_ID IN (1,2,3,4,5);
+
+SELECT  STORE_ID, STORE_NAME, SALES, GEOGRAPHY_ID
+FROM store_information
+WHERE STORE_NAME = 'Los Angeles'
+OR STORE_NAME = 'Boston'
+OR STORE_NAME = 'San Diego';
+
+
+SELECT  STORE_ID, STORE_NAME, SALES, GEOGRAPHY_ID
+FROM store_information
+WHERE STORE_NAME IN ('Los Angeles', 'Boston', 'San Diego');
+
+
+SELECT  STORE_ID, STORE_NAME, SALES
+FROM store_information
+WHERE SALES >= 300 AND SALES <= 2500;
+
+SELECT  STORE_ID, STORE_NAME, SALES
+FROM store_information
+WHERE SALES BETWEEN 300 AND 2500;
+
+
+SELECT  STORE_ID, STORE_NAME, SALES, STORE_DATE
+FROM store_information
+WHERE STORE_DATE BETWEEN '2018-02-01' AND '2018-05-30';
+
+
+SELECT  STORE_ID, STORE_NAME, SALES, STORE_DATE
+FROM store_information
+WHERE STORE_NAME LIKE 'B%';
+
+SELECT  STORE_ID, STORE_NAME, SALES, STORE_DATE
+FROM store_information
+WHERE STORE_NAME LIKE '%s';
+
+SELECT  STORE_ID, STORE_NAME, SALES, STORE_DATE
+FROM store_information
+WHERE STORE_NAME LIKE 'L%s';
+
+
+SELECT  STORE_ID, STORE_NAME, SALES, STORE_DATE
+FROM store_information
+WHERE STORE_NAME LIKE '%a%';
+
+
+-- 1.「且」找出屬於西區的商店
+-- 2.「且」營業額大於300(包含300)
+-- 3.「且」商店名稱'L'開頭
+-- 4.「或」營業日介於2018年3月至4月
+
+SELECT  *
+FROM store_information
+WHERE GEOGRAPHY_ID = 2
+AND ...;
+
+
