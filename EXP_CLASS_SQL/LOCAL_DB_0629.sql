@@ -78,8 +78,49 @@ OR G.GEOGRAPHY_ID IS NULL;
 -- 查詢各區域的營業額總計
 -- 資料結果依營業額總計由大到小排序
 -- (不論該區域底下是否有所屬商店)
-
-SELECT  G.GEOGRAPHY_ID, G.REGION_NAME,
-	S.STORE_ID, S.STORE_NAME, S.SALES, S.GEOGRAPHY_ID
+SELECT  G.REGION_NAME, IFNULL(SUM(S.SALES), 0) "REGION_SUM_SALES"
 FROM geography G
-LEFT JOIN store_information S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
+LEFT JOIN store_information S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+GROUP BY G.REGION_NAME
+ORDER BY REGION_SUM_SALES DESC;
+
+-- 查詢各區域的商店個數
+-- 資料結果依區域的商店個數由大至小排序
+-- (依據商店名稱,不包含重覆的商店)
+-- (不論該區域底下是否有所屬商店)
+SELECT G.REGION_NAME, COUNT(DISTINCT S.STORE_NAME) "STORE_COUNT"
+FROM geography G
+LEFT JOIN store_information S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+GROUP BY G.REGION_NAME
+ORDER BY STORE_COUNT DESC;
+
+SELECT CONCAT(STORE_ID, '/', STORE_NAME, '/', STORE_DATE) 
+FROM store_information;
+
+SELECT STORE_ID, STORE_NAME,
+	SUBSTRING(STORE_NAME, 3),
+    SUBSTRING(STORE_NAME, 1, 3)
+FROM store_information;
+
+SELECT STORE_ID, STORE_NAME, 
+	LTRIM(STORE_NAME), RTRIM(STORE_NAME), TRIM(STORE_NAME)
+FROM store_information;
+
+
+SELECT * FROM store_information;
+
+-- 1.INSERT 新增資料到資料表中
+INSERT INTO store_information(STORE_ID, STORE_NAME, SALES, STORE_DATE, GEOGRAPHY_ID) 
+	VALUES (10, 'Apple Store', 8800, '2024-06-29', 3);
+
+-- 2.UPDATE 更改資料表中的資料
+UPDATE store_information SET SALES = 8888, STORE_NAME = 'New Apple Store' WHERE STORE_ID = 10;
+
+-- 3.DELETE 刪除資料表中的資料
+DELETE FROM store_information  WHERE STORE_ID = 10;
+
+-- 資料回滾(交易取消)
+ROLLBACK;
+
+-- COMMIT 資料提交(完成交易)
+COMMIT;
