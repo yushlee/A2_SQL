@@ -1,3 +1,4 @@
+-- SQL 練習題(五)
 -- HR DB 資料查詢
 -- 查詢所有部門資訊如下：
 -- 1.所在地(國家、洲省、城市)
@@ -23,7 +24,6 @@ FROM departments D
 JOIN locations L ON D.LOCATION_ID = L.LOCATION_ID
 LEFT JOIN employees E ON D.MANAGER_ID = E.EMPLOYEE_ID
 LEFT JOIN jobs J ON E.JOB_ID = J.JOB_ID;
-
 
 SELECT L.COUNTRY_ID, L.STATE_PROVINCE, L.CITY, 
 	D.DEPARTMENT_ID, D.DEPARTMENT_NAME,

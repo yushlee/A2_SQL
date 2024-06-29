@@ -74,4 +74,12 @@ WHERE S.GEOGRAPHY_ID IS NULL
 OR G.GEOGRAPHY_ID IS NULL;
 */
 
+-- SQL 練習題(三)
+-- 查詢各區域的營業額總計
+-- 資料結果依營業額總計由大到小排序
+-- (不論該區域底下是否有所屬商店)
 
+SELECT  G.GEOGRAPHY_ID, G.REGION_NAME,
+	S.STORE_ID, S.STORE_NAME, S.SALES, S.GEOGRAPHY_ID
+FROM geography G
+LEFT JOIN store_information S ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID;
