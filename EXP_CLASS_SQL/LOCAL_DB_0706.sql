@@ -127,6 +127,23 @@ STORE AS (
 )
 SELECT * FROM STORE;
 
-
 -- SQL EXISTS 存在式關聯查詢
+SELECT SUM(SALES) 
+FROM store_information
+WHERE EXISTS (
+	-- 測試「內查詢」有沒有產生任何結果
+	SELECT * FROM geography WHERE GEOGRAPHY_ID = 2
+);
+
+
+SELECT SUM(SALES) 
+FROM store_information S
+WHERE EXISTS (
+	-- 測試「內查詢」有沒有產生任何結果
+	SELECT * FROM geography G 
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+);
+
+
+
 -- SQL CASE WHEN 條件查詢
