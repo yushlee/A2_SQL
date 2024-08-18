@@ -31,10 +31,10 @@
 
 -- Solution
 -- 運用LAG查尋上一個FREE、LEAD查尋下一個FREE
--- 最後在查詢每個座位資料本身FREE為1的值且"上一個FREE"或"下一個FREE"為1的值
+-- 最後在查詢每個座位資料本身FREE為1的值，且"上一個PREV FREE " 或 "下一個NEXT FREE" 為1的值
 -- 即為查詢連續的可用座位
 
-WITH T AS (
+WITH T_CINEMA AS (
 	SELECT SEAT_ID, FREE,
 	-- 返迴上一列的值
 	-- ORDER BY SEAT_ID 為取上一個、下一個值的排序依據
@@ -44,8 +44,8 @@ WITH T AS (
 	FROM CINEMA
 )
 SELECT SEAT_ID
-FROM T
+FROM T_CINEMA
 WHERE FREE = 1
-	AND (PREV = 1 OR NEXT = 1)
+AND (PREV = 1 OR NEXT = 1)
 ORDER BY SEAT_ID;
 

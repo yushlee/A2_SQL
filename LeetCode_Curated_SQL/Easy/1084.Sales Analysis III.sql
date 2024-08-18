@@ -27,9 +27,9 @@
  
 
 -- Write an SQL query that reports the products that were only sold in spring 2019.
--- 僅在2019年春季銷售的產品
+-- 查詢僅在2019年春季銷售的產品
 -- That is, between 2019-01-01 and 2019-03-31 inclusive.
--- 在 '2019-01-01' 和 '2019-03-31' 之間
+-- 日期區間在 '2019-01-01' 和 '2019-03-31' 之間
 
 -- The query result format is in the following example:
 
@@ -59,28 +59,21 @@
 -- | 1           | S8           |
 -- +-------------+--------------+
 -- The product with id 1 was only sold in spring 2019 while the other two were sold after.
--- ID為1的產品'僅在'2019年春季銷售，而其他兩個則在之後銷售
+-- ID為1的產品'僅在'2019年春季銷售，而其它兩個產品則在之後有銷售紀錄
 
 
 -- Solution
--- Oracle
+-- 外查詢:查詢銷售日介於'2019-01-01'和'2019-03-31'之間銷售的產品編號(1、2)
 SELECT S1.PRODUCT_ID, P.PRODUCT_NAME, S1.SALE_DATE 
 FROM SALES S1 JOIN PRODUCT P 
 ON S1.PRODUCT_ID = P.PRODUCT_ID
 WHERE SALE_DATE BETWEEN '2019-01-01' AND '2019-03-31'
+-- 查詢不存在於非介於'2019-01-01'和'2019-03-31'之間銷售的產品編號(1)
 AND NOT EXISTS (
-  SELECT S.PRODUCT_ID
+  -- 內查詢:查詢銷售日非介於'2019-01-01'和'2019-03-31'之間銷售的產品編號(2、3)
+  SELECT S.PRODUCT_ID, S.SALE_DATE
   FROM SALES S
-  WHERE SALE_DATE　NOT BETWEEN '2019-01-01' AND '2019-03-31'
+  WHERE S.SALE_DATE NOT BETWEEN '2019-01-01' AND '2019-03-31'
+  -- 將內外查詢關聯查詢出不存在於內查詢中的產品編號
   AND S1.PRODUCT_ID = S.PRODUCT_ID
 );
-
--- MySQL
-SELECT DISTINCT A.PRODUCT_ID, PRODUCT_NAME, SALE_DATE 
-FROM SALES A JOIN PRODUCT B ON A.PRODUCT_ID = B.PRODUCT_ID 
-WHERE
-A.PRODUCT_ID IN 
-(SELECT PRODUCT_ID FROM SALES WHERE SALE_DATE >= '2019-01-01' AND SALE_DATE <= '2019-03-31')
-AND
-A.PRODUCT_ID NOT IN 
-(SELECT PRODUCT_ID FROM SALES WHERE SALE_DATE < '2019-01-01' OR SALE_DATE > '2019-03-31');

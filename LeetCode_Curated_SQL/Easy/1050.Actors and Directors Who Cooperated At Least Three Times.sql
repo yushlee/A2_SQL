@@ -42,8 +42,9 @@
 -- 唯一的一對是(1, 1)，他們恰好合作3次。
 
 
--- Solution 
-SELECT ACTOR_ID, DIRECTOR_ID
+-- Solution
+-- 將演員編號和導演編號做資料分群，再透過HAVING COUNT找出次數大於3次以上的組合
+SELECT ACTOR_ID, DIRECTOR_ID, COUNT(ACTOR_ID)
 FROM ACTORDIRECTOR
 GROUP BY ACTOR_ID, DIRECTOR_ID
-HAVING COUNT(*) >= 3;
+HAVING COUNT(ACTOR_ID) >= 3;

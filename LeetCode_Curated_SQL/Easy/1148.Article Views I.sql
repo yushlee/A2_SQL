@@ -14,6 +14,7 @@
 -- Each row of this table indicates that some viewer viewed an article (written by some author) on some date. 
 -- 表格的每一行表示某位觀看者在某個日期觀看了某位作者撰寫的文章
 -- Note that equal author_id and viewer_id indicate the same person.
+-- 請注意，相同的author_id 和viewer_id 表示同一個人。
 
 -- Write an SQL query to find all the authors that viewed at least one of their own articles,
 -- 查找所有查看過至少一篇自己的文章的作者
@@ -44,7 +45,7 @@
 
 
 -- Solution
--- 同一人的 author_id 與 viewer_id 相同
+-- 所有查看過至少一篇自己的文章的作者，同一人的 author_id 與 viewer_id 相同
 SELECT DISTINCT AUTHOR_ID AS ID
 FROM VIEWS
 WHERE AUTHOR_ID = VIEWER_ID

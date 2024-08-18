@@ -59,13 +59,13 @@
 -- | 3           |
 -- +-------------+
 -- Both sellers with id 1 and 3 sold products with the most total price of 2800.
--- 編號為1和3的賣方均以最高總價2800出售了產品
+-- 編號為1和3的銷售員均以最高總價2800出售了產品
 
 
 -- Solution
+-- 以銷售員編號做資料分群，透過RNAK函數排序總和產品銷售額，最後再取排名第一的銷售員編號
 SELECT A.SELLER_ID
-FROM (
-  -- 先查詢出所有銷售員的銷售金額加總並排名
+FROM (  
   SELECT SELLER_ID,
   SUM(PRICE),
   RANK() OVER (ORDER BY SUM(PRICE) DESC) AS RK

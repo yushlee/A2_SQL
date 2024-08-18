@@ -43,7 +43,7 @@
 
 
 -- Solution
--- 解題說明:以PLAYER_ID做為資料分群GROUP並運用MIN函數查尋每位玩家最初登入的日期
+-- 解題說明:以PLAYER_ID做為資料分群GROUP，並運用MIN函數查尋每位玩家最初登入的日期
 
 SELECT PLAYER_ID, MIN(EVENT_DATE) AS FIRST_LOGIN
 FROM ACTIVITY

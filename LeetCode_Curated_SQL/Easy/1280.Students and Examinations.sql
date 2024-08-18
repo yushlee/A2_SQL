@@ -9,6 +9,7 @@
 -- +---------------+---------+
 -- student_id is the primary key for this table.
 -- Each row of this table contains the ID and the name of one student in the school.
+-- 表格的每一行包含學校一名學生的 ID 和姓名
  
 
 -- Table: Subjects
@@ -19,7 +20,7 @@
 -- +--------------+---------+
 -- subject_name is the primary key for this table.
 -- Each row of this table contains the name of one subject in the school.
- 
+-- 表格的每一行包含學校一個科目的名稱
 
 -- Table: Examinations
 -- +--------------+---------+
@@ -97,7 +98,7 @@
 -- +------------+--------------+--------------+----------------+
 
 -- The result table should contain all students and all subjects.
--- 結果表應包含所有學生和所有學科
+-- 查詢結果應包含所有學生和所有學科
 -- Alice attended Math exam 3 times, Physics exam 2 times and Programming exam 1 time.
 -- 愛麗絲（Alice）參加了3次數學考試，2次物理考試和1次編程考試。
 -- Bob attended Math exam 1 time, Programming exam 1 time and didn't attend the Physics exam.
@@ -109,42 +110,22 @@
 
 
 -- Solution
--- 學生和科目先交叉連接(學生與科目的所有組合)，再外連接考試表
-SELECT A.STUDENT_ID, A.STUDENT_NAME, A.SUBJECT_NAME, NVL(B.ATTENDED_EXAMS,0) AS ATTENDED_EXAMS
+-- 學生和科目先交叉連接(學生與科目的所有組合)，再外連接考試資料表計算每位學生的各科考試次數
+-- MySQL
+SELECT A.STUDENT_ID, A.STUDENT_NAME, A.SUBJECT_NAME, IFNULL(B.ATTENDED_EXAMS,0) AS ATTENDED_EXAMS
 FROM (
-  SELECT *
+  SELECT STUDENT_ID, STUDENT_NAME, SUBJECT_NAME
   FROM STUDENTS CROSS JOIN SUBJECTS  
-  GROUP BY STUDENT_ID, STUDENT_NAME, SUBJECT_NAME
   ORDER BY STUDENT_ID, SUBJECT_NAME
 ) A
 LEFT JOIN 
 (
-  SELECT S.STUDENT_ID, E.SUBJECT_NAME, COUNT(S.STUDENT_ID) AS ATTENDED_EXAMS
-  FROM STUDENTS S JOIN EXAMINATIONS E
-  ON S.STUDENT_ID = E.STUDENT_ID
-  GROUP BY S.STUDENT_ID, SUBJECT_NAME
-  ORDER BY S.STUDENT_ID, E.SUBJECT_NAME
+  SELECT STUDENT_ID, SUBJECT_NAME, COUNT(STUDENT_ID) AS ATTENDED_EXAMS
+  FROM EXAMINATIONS
+  GROUP BY STUDENT_ID, SUBJECT_NAME
+  ORDER BY STUDENT_ID, SUBJECT_NAME
 ) B
 ON A.STUDENT_ID = B.STUDENT_ID 
 AND A.SUBJECT_NAME = B.SUBJECT_NAME
 ORDER BY A.STUDENT_ID ASC, A.SUBJECT_NAME ASC;
 
--- MySQL
-SELECT A.STUDENT_ID, A.STUDENT_NAME, A.SUBJECT_NAME, IFNULL(B.ATTENDED_EXAMS,0) AS ATTENDED_EXAMS
-FROM (
-  SELECT *
-  FROM STUDENTS CROSS JOIN SUBJECTS  
-  GROUP BY STUDENT_ID, STUDENT_NAME, SUBJECT_NAME
-  ORDER BY STUDENT_ID, SUBJECT_NAME
-) A
-LEFT JOIN 
-(
-  SELECT S.STUDENT_ID, E.SUBJECT_NAME, COUNT(S.STUDENT_ID) AS ATTENDED_EXAMS
-  FROM STUDENTS S JOIN EXAMINATIONS E
-  ON S.STUDENT_ID = E.STUDENT_ID
-  GROUP BY S.STUDENT_ID, SUBJECT_NAME
-  ORDER BY S.STUDENT_ID, E.SUBJECT_NAME
-) B
-ON A.STUDENT_ID = B.STUDENT_ID 
-AND A.SUBJECT_NAME = B.SUBJECT_NAME
-ORDER BY A.STUDENT_ID ASC, A.SUBJECT_NAME ASC;

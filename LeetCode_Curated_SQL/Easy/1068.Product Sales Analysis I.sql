@@ -29,6 +29,9 @@
 
 -- Write an SQL query that reports all product names of the products 
 -- in the Sales table along with their selling year and price.
+-- 編寫一個 SQL 查詢來報告產品的所有產品名稱
+-- 在銷售表中及其銷售年份及價格
+
 
 -- For example:
 
@@ -61,6 +64,7 @@
 
 
 -- Solution
+-- 將產品資料表與銷售資料表透過產品編號連接查詢，並且查出每項產品關聯出所銷售的年份與價格
 SELECT P.PRODUCT_NAME, S.YEAR, S.PRICE
 FROM PRODUCT P JOIN SALES S
 ON P.PRODUCT_ID = S.PRODUCT_ID;

@@ -16,10 +16,10 @@
 -- The table shows the user activities for a social media website.
 -- 使用者在網路社交媒體上的活動資料
 -- Note that each session belongs to exactly one user.
- 
+-- 請注意，每個會話只屬於一個使用者
 
 -- Write an SQL query to find the daily active user count for a period of 30 days ending '2019-07-27' inclusively.
--- 截至2019年7月27日（含）的30天期間的每日活躍用戶數
+-- 查詢截至2019年7月27日（含）的30天期間的每日活躍用戶數
 -- A user was active on some day if he/she made at least one activity on that day.
 
 -- The query result format is in the following example:
@@ -62,7 +62,9 @@ GROUP BY ACTIVITY_DATE;
 
 -- MySQL
 SELECT DATE_SUB('2018-12-31', INTERVAL 1 DAY);
-
+-- Solution
+-- 查詢條件ACTIVITY_DATE介於'2019-07-27'(包含)30日內，將ACTIVITY_DATE做資料分群
+-- 透過COUNT搭配DISTINCT取得去重複的使用者編號數量
 SELECT ACTIVITY_DATE AS DAY, COUNT(DISTINCT USER_ID) AS ACTIVE_USERS
 FROM ACTIVITY
 WHERE ACTIVITY_DATE BETWEEN DATE_SUB('2019-07-27', INTERVAL 29 DAY) AND '2019-07-27'

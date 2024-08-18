@@ -22,13 +22,17 @@
  
 
 -- Note: Every point is unique, which means there is no duplicates in table point
--- 每個點都是唯一的，這意味著表點中沒有重複
+-- Note: 每個點都是唯一的，這意味著表點中沒有重複
 
 -- Solution
-SELECT MIN(NEXT_CLOSEST - X) SHORTEST
-FROM (
-  -- 先查詢出每一個點與下一個點的位置
+-- 先查詢出每一個點與下一個點的位置，計算與下一個點的差距數字，最後使用MIN函數找出最短距離
+-- 使用MIN函數找出最短距離
+SELECT MIN(DIFF) SHORTEST
+FROM (  
   SELECT X,
-  LEAD(X) OVER (ORDER BY X) AS NEXT_CLOSEST
+  -- 查詢出每一個點與下一個點的位置
+  LEAD(X) OVER (ORDER BY X) AS NEXT_CLOSEST,
+  -- 計算與下一個點的差距數字
+  LEAD(X) OVER (ORDER BY X) - X AS DIFF
   FROM POINT
 ) A;

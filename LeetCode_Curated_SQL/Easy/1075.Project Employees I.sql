@@ -24,7 +24,7 @@
 
 -- Write an SQL query that reports the average experience years 
 -- of all the employees for each project, rounded to 2 digits.
--- 每個專案項目的所有員工的平均工作經驗年限，四捨五入到2位數字。
+-- 查詢每個專案項目的所有員工的平均工作經驗年限，四捨五入到2位數字。
 
 -- The query result format is in the following example:
 
@@ -61,6 +61,8 @@
 
 
 -- Solution
+-- 先將專案資料表與員工資料表透過員工編號關聯，再使用專案編號做資料群組
+-- 並且將員工工作經驗年限做AVG平均且四捨五入到2位數字。
 SELECT P.PROJECT_ID, ROUND(AVG(E.EXPERIENCE_YEARS),2) AS AVERAGE_YEARS
 FROM PROJECT P JOIN EMPLOYEE E
 ON P.EMPLOYEE_ID = E.EMPLOYEE_ID

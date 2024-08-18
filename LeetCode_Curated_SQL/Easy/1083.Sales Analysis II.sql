@@ -27,10 +27,12 @@
  
 
 -- Write an SQL query that reports the buyers who have bought 'S8' but not 'iPhone'.
--- 已購買S8但未購買iPhone的買家
+-- 查詢已購買S8但未購買iPhone的買家
 -- Note that S8 and iPhone are products present in the Product table.
+-- 請注意，S8 和 iPhone 是產品表中存在的產品
 
 -- The query result format is in the following example:
+
 
 -- Product table:
 -- +------------+--------------+------------+
@@ -62,16 +64,20 @@
 
 
 -- Solution
-SELECT DISTINCT S1.PRODUCT_ID, S1.BUYER_ID, P.PRODUCT_NAME
+-- 查詢有購買產品S8的購買者，查詢有購買產品iPhone的購買者
+-- 最後再查詢有購買S8的購買者不在於"NOT IN"有購買產品iPhone的購買者
+-- 外查詢:購買'S8'購買者1、3
+SELECT DISTINCT S1.BUYER_ID, P.PRODUCT_ID, P.PRODUCT_NAME
 FROM SALES S1 JOIN PRODUCT P
 ON S1.PRODUCT_ID = P.PRODUCT_ID
 WHERE P.PRODUCT_NAME = 'S8'
-AND NOT EXISTS (
+-- 有購買S8的購買者不在於"NOT IN"有購買產品iPhone的購買者
+AND S1.BUYER_ID NOT IN (
+  -- 內查詢:購買'iPhone'購買者3
   SELECT S.BUYER_ID
   FROM SALES S JOIN PRODUCT P
   ON S.PRODUCT_ID = P.PRODUCT_ID
   WHERE P.PRODUCT_NAME = 'iPhone'
-  AND S1.BUYER_ID = S.BUYER_ID
 );
 
 

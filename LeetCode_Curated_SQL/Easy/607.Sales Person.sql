@@ -69,7 +69,7 @@
 -- 先找出所有訂單(ORDERS)有銷售過RED公司(COMPANY)的銷售員(SALES_ID)
 -- 最後從SALESPERSON找出"不存在於"(NOT IN)銷售過RED公司的銷售員姓名
 
-SELECT NAME
+SELECT SALES_ID, NAME
 FROM SALESPERSON
 -- 不存在於 NOT IN 銷售RED公司訂單的銷售人員
 WHERE SALES_ID NOT IN (
