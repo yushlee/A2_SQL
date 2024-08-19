@@ -43,13 +43,14 @@
 -- Employees with Id 1,2,3 are part of a team with team_id = 8.
 -- ID為 1,2,3 員工是與 TEAM_ID = 8 團隊的一部分
 -- Employees with Id 4 is part of a team with team_id = 7.
--- 與ID 4 員工與 TEAM_ID = 7 團隊的一部分。
+-- ID 4 員工與 TEAM_ID = 7 團隊的一部分。
 -- Employees with Id 5,6 are part of a team with team_id = 9.
 -- 用編號 5,6 員工與 TEAM_ID = 9 團隊的一部分。
 
 
 -- Solution
--- 查詢每個成員及其對應團隊總人數
+-- 內查詢透過TEAM_ID團隊編號資料分群並且計算EMPLOYEE_ID的數量
+-- 在與原先的EMPLOYEE員工資料表透過TEAM_ID團隊編號做關聯，列出每個員所屬團隊數量
 SELECT EMPLOYEE_ID, B.TEAM_SIZE
 FROM EMPLOYEE E JOIN (
   SELECT TEAM_ID, COUNT(EMPLOYEE_ID) AS TEAM_SIZE
