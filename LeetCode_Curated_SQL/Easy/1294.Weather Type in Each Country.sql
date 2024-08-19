@@ -9,7 +9,7 @@
 -- +---------------+---------+
 -- country_id is the primary key for this table.
 -- Each row of this table contains the ID and the name of one country.
- 
+-- 表格的每一行包含一個國家的 ID 和名稱。
 
 -- Table: Weather
 -- +---------------+---------+
@@ -97,8 +97,26 @@
 
 
 -- Solution
+-- 先將WEATHER天氣資料表與COUNTRIES國家資料表透過COUNTRY_ID國家編號關聯連接
+-- 查詢條件MONTH(W.DAY)只取天氣月份並且為11月份資料篩選
+-- 透過COUNTRY_NAME國家名稱做為資料分群
+-- 透過AVG(W.WEATHER_STATE)計算各別國家的天氣狀態平均值
+-- 判斷天氣狀態，其中溫度小於等於15，為'Cold'，溫度大於等於25，為'Hot'，其他溫度區間為'Warm'
+-- MySQL
+SELECT C.COUNTRY_NAME, 
+CASE WHEN AVG(W.WEATHER_STATE) <= 15 THEN 'Cold'
+     WHEN AVG(W.WEATHER_STATE) >= 25 THEN 'Hot'
+     ELSE 'Warm'
+     END AS WEATHER_TYPE,
+     AVG(W.WEATHER_STATE)
+FROM WEATHER W JOIN COUNTRIES C
+ON W.COUNTRY_ID = C.COUNTRY_ID
+WHERE MONTH(W.DAY) = 11
+GROUP BY C.COUNTRY_NAME;
+
+
+
 -- Oracle
--- 判斷每個國家的天氣類型，其中溫度小於等於15，為'Cold'，溫度大於等於25，為'Hot'，其他溫度區間為'Warm'
 SELECT C.COUNTRY_NAME,
 CASE WHEN AVG(W.WEATHER_STATE) <= 15 THEN 'Cold'
      WHEN AVG(W.WEATHER_STATE) >= 25 THEN 'Hot'
@@ -109,14 +127,3 @@ FROM WEATHER W JOIN COUNTRIES C
 ON W.COUNTRY_ID = C.COUNTRY_ID
 WHERE TRUNC(W.DAY, 'MONTH') = '2019-11-01' -- MONTH(月捨去)
 GROUP BY C.COUNTRY_NAME, TRUNC(W.DAY, 'MONTH');
-
--- MySQL
-SELECT C.COUNTRY_NAME, 
-CASE WHEN AVG(W.WEATHER_STATE) <= 15 THEN 'Cold'
-     WHEN AVG(W.WEATHER_STATE) >= 25 THEN 'Hot'
-     ELSE 'Warm'
-     END AS WEATHER_TYPE
-FROM WEATHER W JOIN COUNTRIES C
-ON W.COUNTRY_ID = C.COUNTRY_ID
-WHERE MONTH(W.DAY) = 11
-GROUP BY C.COUNTRY_NAME;
