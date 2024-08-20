@@ -25,7 +25,7 @@
 -- 編寫SQL查詢以找到每個廣告的點擊率
 
 -- Round ctr to 2 decimal points.
--- 將ctr舍入到2個小數點
+-- 將ctr捨入到2個小數點
 -- Order the result table by ctr in descending order and by ad_id in ascending order in case of a tie.
 -- 按照 "ctr 降序" 對結果進行排序，在點擊率相同的情況下，則按 "ad_id按升序" 對結果表進行排序
 
@@ -67,6 +67,29 @@
 
 
 -- Solution
+-- MySQL
+-- 子查詢T1廣告點數擊：透過AD_ID廣告編號資料分群，透過CASE WHEN判斷式若值為'Clicked'值為1否則為0，再透過SUM函數將點擊數加總
+-- 子查詢T2廣告點數擊查看數：透過AD_ID廣告編號資料分群，透過CASE WHEN判斷式若值為'Clicked'、'Viewed'值為1否則為0，再透過SUM函數將點擊數與查看數加總
+-- 最後將T1子查詢與T2子查詢透過AD_ID廣告編號欄位關聯，T1點擊數加總除以T2點擊數與查詢數加總，百分比後取小數點後兩位
+WITH T1 AS(
+  SELECT AD_ID, 
+	SUM(CASE WHEN ACTION = 'Clicked' THEN 1 ELSE 0 END) AS CLICKED
+  FROM ADS
+  GROUP BY AD_ID
+),
+T2 AS (
+  SELECT AD_ID,
+	SUM(CASE WHEN ACTION IN ('Clicked','Viewed') THEN 1 ELSE 0 END) AS TOTAL
+  FROM ADS
+  GROUP BY AD_ID
+)
+SELECT T1.AD_ID, 
+	IFNULL(ROUND(T1.CLICKED / NULLIF(T2.TOTAL, 0) * 100, 2), 0) AS CTR
+FROM T1 JOIN T2
+ON T1.AD_ID = T2.AD_ID
+ORDER BY CTR DESC, AD_ID;
+
+
 -- Oracle
 WITH T1 AS(
   -- 計算每一個AD的"點擊數"加總
@@ -90,24 +113,3 @@ ORDER BY CTR DESC, AD_ID;
 
 -- 語法為「NULLIF ( expression-1 , expression-2 )」
 -- 當 expression-1 的值與 expression-2 的值相同時，便會回傳 NULL，其他的就會如實的回傳 expression-1
-
--- MySQL
-WITH T1 AS(
-  -- 計算每一個AD的"點擊數"加總
-  SELECT AD_ID, 
-	SUM(CASE WHEN ACTION IN ('Clicked') THEN 1 ELSE 0 END) AS CLICKED
-  FROM ADS
-  GROUP BY AD_ID
-),
-T2 AS (
-  -- 計算每一個AD的"點擊數"及"查看"的加總
-  SELECT AD_ID,
-	SUM(CASE WHEN ACTION IN ('Clicked','Viewed') THEN 1 ELSE 0 END) AS TOTAL
-  FROM ADS
-  GROUP BY AD_ID
-)
-SELECT T1.AD_ID, 
-	IFNULL(ROUND(CLICKED / NULLIF(TOTAL, 0) * 100, 2), 0) AS CTR
-FROM T1 JOIN T2
-ON T1.AD_ID = T2.AD_ID
-ORDER BY CTR DESC, AD_ID;
