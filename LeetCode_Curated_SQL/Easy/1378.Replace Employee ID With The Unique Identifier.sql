@@ -10,6 +10,7 @@
 -- +---------------+---------+
 -- id is the primary key for this table.
 -- Each row of this table contains the id and the name of an employee in a company.
+-- 表格的每一行包含公司中員工的 ID 和姓名
 
 -- Table: EmployeeUNI
 -- +---------------+---------+
@@ -20,6 +21,7 @@
 -- +---------------+---------+
 -- (id, unique_id) is the primary key for this table.
 -- Each row of this table contains the id and the corresponding unique id of an employee in the company.
+-- 表格的每一行包含公司中員工的 id 和對應的唯一 id
 
 -- Write an SQL query to show the unique ID of each user, If a user doesn't have a unique ID replace just show null.
 -- Return the result table in any order.
@@ -63,6 +65,8 @@
 
 
 -- Solution
+-- 以EMPLOYEES員工資料表為主使用LEFT JOIN左外側連接
+-- 查詢EMPLOYEEUNI員工識別編號資料表UNIQUE_ID識別編號、員工資料表員工姓名NAME
 SELECT U.UNIQUE_ID, E.NAME
 FROM EMPLOYEES E LEFT JOIN EMPLOYEEUNI U
 ON E.ID = U.ID

@@ -9,6 +9,7 @@
 -- +---------------+---------+
 -- id is the primary key of this table.
 -- The table has information about the id of each department of a university.
+-- 該表包含有關大學每個系的 ID 的資訊
 
 
 -- Table: Students
@@ -21,6 +22,7 @@
 -- +---------------+---------+
 -- id is the primary key of this table.
 -- The table has information about the id of each student at a university and the id of the department he/she studies at.
+-- 表格包含有關大學中每個學生的 id 以及他/她就讀的系所 id 的資訊。
 
 -- Write an SQL query to find the id and the name of all students who are enrolled in departments that no longer exists.
 -- 查找已不存在的系中所有已註冊學生的ID和名稱。
@@ -70,8 +72,9 @@
 
 
 -- Solution
-SELECT S.ID, S.NAME, D.NAME
+-- 透過LEFT JOIN將"全部"學生資料與科系資料表，使用科系編號DEPARTMENT_ID、ID關聯
+-- 篩選D.ID IS NULL科系編號為空值，去除右側資料表 DEPARTMENTS 的結果
+SELECT S.ID, S.NAME
 FROM STUDENTS S LEFT JOIN DEPARTMENTS D
 ON S.DEPARTMENT_ID = D.ID
--- 去除右側資料表 DEPARTMENTS 的結果
-WHERE D.NAME IS NULL;
+WHERE D.ID IS NULL;

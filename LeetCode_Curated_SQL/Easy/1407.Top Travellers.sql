@@ -1,4 +1,4 @@
--- 1407.Top Travellers
+-- 1407.Top Travellers 熱門旅客
 
 -- Table: Users
 -- +---------------+---------+
@@ -8,7 +8,7 @@
 -- | name          | varchar |
 -- +---------------+---------+
 -- id is the primary key for this table.
--- name is the name of the user. 
+-- name is the name of the user.
 
 
 -- Table: Rides
@@ -29,7 +29,8 @@
 -- Return the result table ordered by travelled_distance in descending order, 
 -- if two or more users travelled the same distance, order them by their name in ascending order.
 
--- 查詢以報告每個用戶的行進距離，查詢結果按 travelled_distance 降序排列，如果兩個或多個用戶旅行相同的距離，請按其名稱(name) 升序排列。
+-- 查詢以報告每個用戶的行進距離，查詢結果按照 travelled_distance 行駛距離降序排列
+-- 如果兩個或多個用戶旅行相同的距離，請按其名稱(name)升序排列
 
 -- The query result format is in the following example. 
 
@@ -85,6 +86,24 @@
 
 
 -- Solution
+-- 使用LEFT JOIN左外側連接以USERS資料表為主，透過U.ID = R.USER_ID使用者編號與RIDES資料表關聯
+-- 透過NAME使用者名稱資料分群，將RIDES資料表DISTANCE行駛距離透過SUM函數加總
+-- 並且使用IFNULL函數使空值為0，依總行駛距離降幕排序、再依姓名升幕排序
+-- MySQL
+SELECT U.NAME,
+	IFNULL(SUM(R.DISTANCE), 0) AS TRAVELLED_DISTANCE 
+FROM USERS U LEFT JOIN RIDES R
+ON U.ID = R.USER_ID
+GROUP BY NAME
+ORDER BY TRAVELLED_DISTANCE DESC, NAME;
+
+
+SELECT U.ID, U.NAME, R.USER_ID, R.DISTANCE
+FROM USERS U LEFT JOIN RIDES R
+ON U.ID = R.USER_ID
+ORDER BY NAME, R.DISTANCE DESC;
+
+
 -- Oracle
 SELECT U.NAME,
 	NVL(SUM(R.DISTANCE), 0) AS TRAVELLED_DISTANCE 
@@ -93,10 +112,4 @@ ON R.USER_ID = U.ID
 GROUP BY NAME
 ORDER BY TRAVELLED_DISTANCE DESC, NAME;
 
--- MySQL
-SELECT U.NAME,
-	IFNULL(SUM(R.DISTANCE), 0) AS TRAVELLED_DISTANCE 
-FROM USERS U LEFT JOIN RIDES R
-ON R.USER_ID = U.ID
-GROUP BY NAME
-ORDER BY TRAVELLED_DISTANCE DESC, NAME;
+

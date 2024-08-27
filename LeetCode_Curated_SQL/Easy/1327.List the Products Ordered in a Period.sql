@@ -10,6 +10,7 @@
 -- +------------------+---------+
 -- product_id is the primary key for this table.
 -- This table contains data about the company's products.
+-- 此表包含有關公司產品的資料
 
 -- Table: Orders
 -- +---------------+---------+
@@ -22,6 +23,7 @@
 -- There is no primary key for this table. It may have duplicate rows.
 -- product_id is a foreign key to Products table.
 -- unit is the number of products ordered in order_date.
+-- unit 單位是 order_date 中訂購的產品數量
 
 -- Write an SQL query to get the names of products with "greater than or equal to 100 units"
 -- ordered in "February 2020" and their amount.
@@ -76,6 +78,19 @@
 
 
 -- Solution
+-- 先將訂單資料表與產品資料表透過產品編號PRODUCT_ID關聯
+-- 查詢條件訂單日ORDER_DATE取年等於2020、ORDER_DATE取月等於2
+-- 使用產品名稱PRODUCT_NAME做資料分群，並透過HAVING篩選總合訂購量大於等於100
+-- MySQL
+SELECT P.PRODUCT_NAME, SUM(UNIT) "UNIT"
+FROM ORDERS O JOIN PRODUCTS P
+ON O.PRODUCT_ID = P.PRODUCT_ID
+WHERE YEAR(ORDER_DATE) = 2020 AND MONTH(ORDER_DATE) = 2
+GROUP BY P.PRODUCT_NAME
+HAVING SUM(UNIT) >= 100
+ORDER BY "UNIT" DESC;
+
+
 -- Oracle
 SELECT P.PRODUCT_NAME, SUM(UNIT) "UNIT"
 FROM ORDERS O JOIN PRODUCTS P
@@ -85,12 +100,3 @@ GROUP BY P.PRODUCT_NAME
 HAVING SUM(UNIT) >= 100
 ORDER BY "UNIT" DESC;
 
-
--- MySQL
-SELECT P.PRODUCT_NAME, SUM(UNIT) "UNIT"
-FROM ORDERS O JOIN PRODUCTS P
-ON O.PRODUCT_ID = P.PRODUCT_ID
-WHERE YEAR(ORDER_DATE) = 2020 AND MONTH(ORDER_DATE) = 2
-GROUP BY P.PRODUCT_NAME
-HAVING SUM(UNIT) >= 100
-ORDER BY "UNIT" DESC;
