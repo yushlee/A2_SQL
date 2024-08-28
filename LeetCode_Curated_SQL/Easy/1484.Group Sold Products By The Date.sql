@@ -1,6 +1,6 @@
 -- 1484.Group Sold Products By The Date
 
--- Table Activities:
+-- Table: Activities
 -- +-------------+---------+
 -- | Column Name | Type    |
 -- +-------------+---------+
@@ -12,7 +12,7 @@
 -- 該表的每一行都包含產品名稱和在市場上出售的日期。
 
 -- Write an SQL query to find for each date, the number of "distinct products" 'sold' and their 'names'.
--- 查找每個日期，所售"不同產品"的'數量'及其'名稱'
+-- 查找每個日期所售"不同產品"的'數量'及其'名稱'
 
 -- The sold-products names for each date should be sorted lexicographically. 
 -- 每個日期的已售產品名稱應按字典順序排序
@@ -50,6 +50,18 @@
 
 
 -- Solution
+-- 先將資料依SELL_DATE出售日資料分群
+-- 透過COUNT函數搭配DISTINCT計算去重覆後的PRODUCT產品數量
+-- 透過GROUP_CONCAT搭配DISTINCT群組清單並且ORDER BY升幕排序PRODUCT產品名稱
+-- MySQL
+SELECT SELL_DATE,
+	COUNT(DISTINCT PRODUCT) AS NUM_SOLD,
+	GROUP_CONCAT(DISTINCT PRODUCT ORDER BY PRODUCT) AS PRODUCTS
+FROM ACTIVITIES
+GROUP BY SELL_DATE
+ORDER BY SELL_DATE;
+
+
 -- Oracle 19c and later
 SELECT SELL_DATE, COUNT(DISTINCT PRODUCT) NUM_SOLD,
 	LISTAGG(DISTINCT PRODUCT, ',') WITHIN GROUP (ORDER BY PRODUCT)
@@ -69,10 +81,4 @@ FROM　SELL_DATE_ACT
 GROUP BY SELL_DATE
 ORDER BY SELL_DATE;
 
--- MySQL
-SELECT SELL_DATE,
-	COUNT(DISTINCT PRODUCT) AS NUM_SOLD,
-	GROUP_CONCAT(DISTINCT PRODUCT) AS PRODUCTS
-FROM ACTIVITIES
-GROUP BY SELL_DATE
-ORDER BY SELL_DATE;
+
