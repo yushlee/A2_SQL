@@ -10,14 +10,14 @@
 --  +---------------+---------+
 --  user_id is the primary key for this table.
 --  This table contains information of the users signed up in a website. Some e-mails are invalid.
--- 此表包含在網站上註冊的用戶的信息。一些電子郵件無效。
+--  此表包含在網站上註冊的用戶的信息。和一些無效的電子郵件
 
 --  Write an SQL query to find the users who have valid emails.
--- 查找擁有有效電子郵件的用戶
+--  查找擁有有效電子郵件的用戶
   
 -- A valid e-mail has a "prefix name" and a "domain" where:
 -- The prefix name is a string that may contain letters (upper or lower case), digits, 
--- 前綴名稱是一個"字符串"，可能包含字母（大寫或小寫）、數字、
+-- 有效的電子郵件前綴名稱是一個"字符串"，可能包含字母（大寫或小寫）、數字、
 -- underscore '_', period '.' and/ or dash '-'. The prefix name must start with a letter.
 -- 下劃線'_'、句點'.'和/ 或 破折號'-'。前綴名稱必須以字母開頭
 -- The domain is '@leetcode.com'.
@@ -60,13 +60,8 @@
 
 
 -- Solution
--- Oracle
--- 語法規則：https://docs.oracle.com/cd/B19306_01/B14251_01/adfns_regexp.htm
-SELECT * FROM USERS
-WHERE REGEXP_LIKE(MAIL, '^[A-Za-z]+[A-Za-z0-9_./-]*@leetcode.com$');
-
 -- MySQL
--- 語法規則：https://www.runoob.com/mysql/mysql-regexp.html
+-- MySQL Regular rxpression 語法規則：https://www.runoob.com/mysql/mysql-regexp.html
 --  ^ 表示開頭
 --  + 符合一個或多個,不包括空值
 --  * 符合零個或多個
@@ -74,5 +69,16 @@ WHERE REGEXP_LIKE(MAIL, '^[A-Za-z]+[A-Za-z0-9_./-]*@leetcode.com$');
 --  \\ 用於轉譯特殊字符
 --  a{m,n} 符合 m 到 n 個 a，左側不寫為0，右側不寫為任意
 --  $ 表示以什麼為結尾
+
+-- 運用Regular rxpression正規表示式篩選符合的電子郵件資料格式
+-- ^[a-zA-Z] 開頭小寫a-z大寫A-Z字母
+-- +[a-zA-Z0-9_./-] 符合零個或多個小寫a-z大寫A-Z數字0~9下底線_句點.斜線/破折號 '-'
+-- @leetcode.com$ 結尾@leetcode.com
 SELECT * FROM USERS
-WHERE MAIL REGEXP '^[a-zA-Z]+[a-zA-Z0-9_\\./\\-]{0,}@leetcode\\.com$';
+WHERE MAIL REGEXP '^[a-zA-Z]+[a-zA-Z0-9_./-]*@leetcode.com$';
+
+
+-- Oracle
+-- 語法規則：https://docs.oracle.com/cd/B19306_01/B14251_01/adfns_regexp.htm
+SELECT * FROM USERS
+WHERE REGEXP_LIKE(MAIL, '^[A-Za-z]+[A-Za-z0-9_./-]*@leetcode.com$');

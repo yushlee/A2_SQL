@@ -1,4 +1,4 @@
--- 1511.Customer Order Frequency
+-- 1511.Customer Order Frequency 客戶訂單頻率
 
 --  Table: Customers
 --  +---------------+---------+
@@ -8,9 +8,10 @@
 --  | name          | varchar |
 --  | country       | varchar |
 --  +---------------+---------+
---  customer_id is the primary key for this table.
---  This table contains information of the customers in the company.
---  
+-- customer_id is the primary key for this table.
+-- This table contains information of the customers in the company.
+-- 該表包含公司客戶的信息
+
 --  Table: Product
 --  +---------------+---------+
 --  | Column Name   | Type    |
@@ -21,10 +22,9 @@
 --  +---------------+---------+
 --  product_id is the primary key for this table.
 --  This table contains information of the products in the company.
---  price is the product cost.
---  
---  
---  
+-- price is the product cost.
+-- 此表包含公司產品資訊，價格是產品成本
+
 --  Table: Orders
 --  +---------------+---------+
 --  | Column Name   | Type    |
@@ -37,13 +37,15 @@
 --  +---------------+---------+
 --  order_id is the primary key for this table.
 --  This table contains information on customer orders.
+--  該表包含有關客戶訂單的資訊
 --  customer_id is the id of the customer who bought "quantity" products with id "product_id".
 --  customer_id 是購買了 ID 為 "product_id" 的 "數量" 產品的客戶的 ID
 --  Order_date is the date in format ('YYYY-MM-DD') when the order was shipped.
 --  Order_date 是訂單出貨時格式 ('YYYY-MM-DD') 的日期。
 
+
 -- Write an SQL query to report the customer_id and customer_name of customers who have spent at least $100 in each month of June and July 2020.
--- 2020年 6月 和 7月 的每個月至少花費 100 美元的客戶的 customer_id 和 customer_name
+-- 2020年6月和7月的每個月至少花費100美元的客戶的customer_id和customer_name
 
 --  Return the result table in any order.
 
@@ -93,20 +95,23 @@
 
 
 -- Solution
-SELECT CUSTOMER_ID, NAME FROM CUSTOMERS
-WHERE CUSTOMER_ID IN (
-  SELECT A.CUSTOMER_ID 
-  FROM ORDERS A JOIN PRODUCT B  
-  ON A.PRODUCT_ID = B.PRODUCT_ID
-  WHERE A.ORDER_DATE BETWEEN '2020-06-01' AND '2020-06-30'
-  GROUP BY A.CUSTOMER_ID
-  HAVING SUM(A.QUANTITY * B.PRICE) >= 100
-)
-AND CUSTOMER_ID IN (
-  SELECT A.CUSTOMER_ID 
-  FROM ORDERS A JOIN PRODUCT B  
-  ON A.PRODUCT_ID = B.PRODUCT_ID
-  WHERE A.ORDER_DATE BETWEEN '2020-07-01' AND '2020-07-31'
-  GROUP BY A.CUSTOMER_ID
-  HAVING SUM(A.QUANTITY * B.PRICE) >= 100
-);
+-- ORDERS訂單資料表與PRODUCT產品資料表透過PRODUCT_ID產品編號關聯
+-- ORDERS訂單資料表與CUSTOMERS顧客資料表透過CUSTOMER_ID顧客編號關聯
+-- 篩選ORDER_DATE訂單日期介於'2020-06-01'與'2020-07-31'之間的顧客訂單資料
+-- 透過CUSTOMER_ID顧客編號將資料分群
+-- 透過HAVING篩選SUM加總IF分別2020年6月、2020年7月訂單數量乘商品價格大於等於100美元的訂單資料
+SELECT O.CUSTOMER_ID, C.NAME
+FROM ORDERS O
+JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+JOIN CUSTOMERS C ON O.CUSTOMER_ID = C.CUSTOMER_ID
+WHERE O.ORDER_DATE BETWEEN '2020-06-01' AND '2020-07-31'
+GROUP BY O.CUSTOMER_ID
+HAVING SUM(IF(O.ORDER_DATE LIKE '2020-06%', O.QUANTITY * P.PRICE,0)) >= 100
+AND SUM(IF(ORDER_DATE LIKE '2020-07%', O.QUANTITY * P.PRICE,0)) >= 100;
+
+
+SELECT O.CUSTOMER_ID, O.PRODUCT_ID, O.QUANTITY, P.PRICE, O.ORDER_DATE
+FROM ORDERS O
+JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+JOIN CUSTOMERS C ON O.CUSTOMER_ID = C.CUSTOMER_ID
+WHERE O.ORDER_DATE BETWEEN '2020-06-01' AND '2020-07-31';

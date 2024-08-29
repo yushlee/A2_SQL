@@ -10,8 +10,9 @@
 -- +---------------+---------+
 -- (program_date, content_id) is the primary key for this table.
 -- This table contains information of the programs on the TV.
+-- 表格包含電視上的節目資訊
 -- content_id is the id of the program on some channels on the TV.
-
+-- content_id 是電視上某些頻道的節目 ID
 
 -- Table: Content
 -- +---------------+---------+
@@ -25,7 +26,7 @@
 -- content_id is the primary key for this table.
 -- Kids_content is an enum that takes one of the values ('Y', 'N') 
 -- where:'Y' means is content for kids otherwise 'N' is not content for kids.
--- 'Y'表示內容適合小孩，'N'表示內容不適合小孩
+-- Kids_content'Y'表示內容適合小孩，'N'表示內容不適合小孩
 -- content_type is the category of the content as movies, series, etc.
 -- content_type 是內容的類別，例如電影，連續劇等
 
@@ -49,7 +50,7 @@
 
 
 -- Content table:
--- Series(系列)
+-- Series(連續劇)
 -- +------------+----------------+---------------+---------------+
 -- | content_id | title          | Kids_content  | content_type  |
 -- +------------+----------------+---------------+---------------+
@@ -80,6 +81,17 @@
 
 
 -- Solution
+-- MySQL
+-- TVPROGRAM節目資訊資料表與內容資料表透過CONTENT_ID內容編號關聯
+-- 篩選條件KIDS_CONTENT兒童內容為'Y'、CONTENT_TYPE內容類型為'Movies'、MONTH(T.PROGRAM_DATE)取播放月份為6月
+SELECT C.TITLE, MONTH(T.PROGRAM_DATE) PROGRAM_DATE_MONTH
+FROM TVPROGRAM T JOIN CONTENT C
+ON T.CONTENT_ID = C.CONTENT_ID
+WHERE C.KIDS_CONTENT = 'Y'
+AND C.CONTENT_TYPE = 'Movies'
+AND MONTH(T.PROGRAM_DATE) = 6;
+
+
 -- Oracle
 SELECT DISTINCT C.TITLE, TRUNC(PROGRAM_DATE, 'MONTH') TRUNC_MONTH
 FROM CONTENT C JOIN TVPROGRAM T
@@ -87,9 +99,3 @@ ON C.CONTENT_ID = T.CONTENT_ID
 WHERE KIDS_CONTENT = 'Y' AND CONTENT_TYPE = 'Movies'
 AND TRUNC(PROGRAM_DATE, 'MONTH') = '2020-06-01';
 
--- MySQL
-SELECT DISTINCT C.TITLE  , MONTH(T.PROGRAM_DATE) PROGRAM_DATE_MONTH
-FROM CONTENT C JOIN TVPROGRAM T
-ON C.CONTENT_ID = T.CONTENT_ID
-WHERE C.KIDS_CONTENT = 'Y' AND C.CONTENT_TYPE = 'Movies'
-AND MONTH(T.PROGRAM_DATE) = 6;
