@@ -12,11 +12,11 @@
 --  (player_id, event_date) is the primary key of this table.
 --  This table shows the activity of players of some game.
 --  Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
--- 該表記錄了遊戲用戶的行為信息，主鍵為(player_id, event_date)的組合。每一行記錄每個遊戲用戶登錄情況以及玩的遊戲數(玩的遊戲可能是0)。
+--  該表記錄了遊戲用戶的行為信息，主鍵為(player_id, event_date)的組合。每一行記錄每個遊戲用戶登錄情況以及玩的遊戲數(玩的遊戲可能是0)。
 
 -- Write an SQL query that reports for each player and date, how many games played so far by the player.
 -- That is, the total number of games played by the player until that date. Check the example for clarity.
--- 按照日期，查詢每個用戶"累積"玩的遊戲數
+-- 按照日期查詢每個用戶"累積"玩的遊戲數
 
 --  The query result format is in the following example:
 --  Activity table:
@@ -66,9 +66,12 @@ FROM ACTIVITY A
 ORDER BY A.PLAYER_ID, A.EVENT_DATE;
 
 -- Solution 3
--- 運用SUM函數將 "GAMES_PLAYED" 加總，並依照 "PLAYER_ID" 劃分PARTITION 資料
--- 並且依 "EVENT_DATE" 排序累計，達到累積總合
+-- 查詢目的為每位玩家每一天的"累積"遊戲數
+-- 運用SUM函數將 "GAMES_PLAYED" 加總，並依照 "PLAYER_ID" 資料PARTITION劃分
+-- 並且依 "EVENT_DATE" 排序達到依事件日期累積總合
+-- SUM OVER + PARTITION BY + ORDER BY = 資料劃分累積總合
 SELECT PLAYER_ID, EVENT_DATE, 
-SUM(GAMES_PLAYED) OVER (PARTITION BY PLAYER_ID ORDER BY EVENT_DATE) AS GAMES_PLAYED_SO_FAR
-FROM ACTIVITY
-ORDER BY 1,2;
+	SUM(GAMES_PLAYED) OVER (
+		PARTITION BY PLAYER_ID ORDER BY EVENT_DATE
+	) AS GAMES_PLAYED_SO_FAR
+FROM ACTIVITY;

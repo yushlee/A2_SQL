@@ -1,14 +1,6 @@
 -- 580.Count Student Number in Departments
 
---  A university uses 2 data tables, student and department, to store data about its students and the departments associated with each major.
---  某大學使用student 表和department 表來記錄各部門學生的情況。
-
---  Write a query to print the respective department name and number of students majoring in each department 
---  for all departments in the department table (even ones with no current students).
---  Sort your results by descending number of students; if two or more departments have the same number of students, 
---  then sort those departments alphabetically by department name.
--- 查詢每個部門下的學生數，要列出所有部門，即使該部門沒有學生。結果按學生數降序、部門名稱升序排列
-
+--  Table:Student
 --  The STUDENT is described as follow:
 --  | Column Name  | Type      |
 --  |--------------|-----------|
@@ -20,6 +12,8 @@
 --  and dept_id is the department ID associated with their declared major.
 --  該表中包含學生編號、學生姓名、學生性別以及所屬部門
 
+
+--  Table:Department
 --  And the DEPARTMENT table is described as below:
 --  | Column Name | Type    |
 --  |-------------|---------|
@@ -43,6 +37,17 @@
 --  | 2       | Science     |
 --  | 3       | Law         |
 
+
+--  A university uses 2 data tables, student and department, to store data about its students and the departments associated with each major.
+--  某大學使用student表和department表來記錄各部門學生的情況。
+
+--  Write a query to print the respective department name and number of students majoring in each department 
+--  for all departments in the department table (even ones with no current students).
+--  Sort your results by descending number of students; if two or more departments have the same number of students, 
+--  then sort those departments alphabetically by department name.
+--  查詢每個部門下的學生數，要列出所有部門，即使該部門沒有學生。結果按學生數降序、部門名稱升序排列
+
+
 --  The Output should be:
 --  | dept_name   | student_number |
 --  |-------------|----------------|
@@ -52,7 +57,11 @@
 
 
 -- Solution
-SELECT DEPT_NAME, COUNT(S.DEPT_ID) AS STUDENT_NUMBER
+-- 以部門資料表為主與學生資料表透過部門編號左外部關聯
+-- 透過DEPT_NAME部門名稱將資料分群
+-- 再使用COUNT函數計算各部門的STUDENT_ID學生數量
+-- 最後資料結果按學生數量降序、部門名稱升序排列
+SELECT DEPT_NAME, COUNT(S.STUDENT_ID) AS STUDENT_NUMBER
 FROM DEPARTMENT D LEFT JOIN STUDENT S
 ON D.DEPT_ID = S.DEPT_ID
 GROUP BY D.DEPT_NAME

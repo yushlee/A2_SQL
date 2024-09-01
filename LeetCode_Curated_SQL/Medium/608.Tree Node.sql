@@ -2,6 +2,8 @@
 
 --  Given a table TREE, id is identifier of the tree node and p_id is its parent node's id.
 -- 下表中，id 為每一個節點的編號，p_id 為每個節點的父節點。
+
+-- Table:Tree
 --  +----+------+
 --  | id | p_id |
 --  +----+------+
@@ -16,9 +18,9 @@
 --  Root: if the node is the root of the tree.
 --  Inner: If the node is neither a leaf node nor a root node.   
 --  樹中的每個節點可以是以下三種類型之一：
---  葉：如果節點是葉節點。
---  根：如果節點是樹的根。
---  內部：如果節點既不是'葉節點'也不是'根節點'。
+--  葉(Leaf)：如果節點是葉節點。
+--  根(Root)：如果節點是樹的根。
+--  內部(Inner)：如果節點既不是'葉節點'也不是'根節點'。
 
 --  Write a query to print the node id and the type of the node. 
 -- 列出每一個節點及其所屬類型
@@ -35,7 +37,7 @@
 --  | 4  | Leaf |
 --  | 5  | Leaf |
 --  +----+------+ 
---  Explanation  
+--  Explanation
 --  Node '1' is root node, because its parent node is NULL and it has child node '2' and '3'.
 --  節點'1' 是根節點，因為它的父節點是 NULL 並且它有子節點 '2' 和 '3'。
 --  Node '2' is inner node, because it has parent node '1' and child node '4' and '5'.
@@ -54,11 +56,17 @@
 
 
 -- Solution
+-- 使用CASE WHEN多條件判斷式
+-- 判斷該節點無根節點(無父)為'Root'
+-- 判斷該節點不在"所有父節點"之中為葉節點(無子)'Leaf'
+-- 不為根節點也不為葉節點(有父有子)則為內節點'Inner'
+
 SELECT ID,
-CASE WHEN P_ID IS NULL THEN 'Root' -- 根節點(無父)
-     -- 葉節點(無子):判斷節點不在"所有父節點"之中
-     WHEN ID NOT IN (SELECT P_ID FROM TREE WHERE P_ID IS NOT NULL GROUP BY P_ID) THEN 'Leaf'
-     -- 內節點(有父有子)
+	CASE      
+	 WHEN P_ID IS NULL THEN 'Root'     
+     WHEN ID NOT IN (
+		SELECT P_ID FROM TREE WHERE P_ID IS NOT NULL
+	 ) THEN 'Leaf'     
      ELSE 'Inner'
      END AS TYPE
 FROM TREE

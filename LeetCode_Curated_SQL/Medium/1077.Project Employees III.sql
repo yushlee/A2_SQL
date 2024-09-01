@@ -57,21 +57,22 @@
 --  | 2           | 1             |
 --  +-------------+---------------+
 --  Both employees with id 1 and 3 have the most experience among the employees of the first project. 
---  id 為 1 和 3 的員工都有第一個項目的員工中最有經驗的
+--  id 為 1 和 3 的員工皆是第一個專案的員工中最有經驗的
 --  For the second project, the employee with id 1 has the most experience.
---  對於第二個項目，id 為 1 的員工最有經驗
+--  對於第二個專案，id 為 1 的員工最有經驗
 
 
 -- Solution
+-- 專案資料表與員工資料表透過員工編號關聯
+-- 使用RANK函數依照 PROJECT_ID 做資料劃分，並且依EXPERIENCE_YEARS經驗年資排名
+-- 最後查詢篩選各專案年資經驗第一名的員工
 WITH RANK_EMP AS (
-  SELECT P.PROJECT_ID, E.EMPLOYEE_ID, E.NAME, E.EXPERIENCE_YEARS,
-  -- 依照 PROJECT_ID 做資料劃分，並依 EXPERIENCE_YEARS 排名次
-  RANK() OVER (PARTITION BY P.PROJECT_ID ORDER BY E.EXPERIENCE_YEARS DESC) RANK_YEAR
+  SELECT P.PROJECT_ID, E.EMPLOYEE_ID, E.NAME, E.EXPERIENCE_YEARS,	  
+	  RANK() OVER (PARTITION BY P.PROJECT_ID ORDER BY E.EXPERIENCE_YEARS DESC) RANK_EXP_YEAR
   FROM PROJECT P JOIN EMPLOYEE E
   ON P.EMPLOYEE_ID = E.EMPLOYEE_ID
   ORDER BY P.PROJECT_ID
 )
 SELECT PROJECT_ID, EMPLOYEE_ID
--- 查詢各專案年資第一名的員工
-FROM RANK_EMP WHERE RANK_YEAR = 1;
+FROM RANK_EMP WHERE RANK_EXP_YEAR = 1;
 

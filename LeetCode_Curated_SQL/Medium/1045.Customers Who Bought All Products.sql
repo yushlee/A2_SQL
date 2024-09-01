@@ -49,13 +49,16 @@
 --  | 3           |
 --  +-------------+
 --  The customers who bought all the products (5 and 6) are customers with id 1 and 3.
---  購買了所有產品（5 和 6）的客戶是 ID 為 1 和 3 的客戶
+--  購買了所有產品(5 和 6)的客戶是ID為1和3的客戶
 
 
 -- Solution
-SELECT CUSTOMER_ID
+-- 顧客資料表透過CUSTOMER_ID顧客編號資料分群
+-- 使用HAVING篩選透過COUNT函數搭配DISTINCT計算去重覆後的PRODUCT_KEY購買商品總數
+-- 等於PRODUCT商品資料表的資料總數，即為購買全商品的顧客
+SELECT CUSTOMER_ID, COUNT(DISTINCT PRODUCT_KEY) AS BUY_COUNT
 FROM CUSTOMER
 GROUP BY CUSTOMER_ID
 HAVING COUNT(DISTINCT PRODUCT_KEY) = (
-  SELECT COUNT(DISTINCT PRODUCT_KEY) FROM PRODUCT
+  SELECT COUNT(PRODUCT_KEY) FROM PRODUCT
 );

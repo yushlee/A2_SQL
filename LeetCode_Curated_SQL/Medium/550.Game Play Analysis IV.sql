@@ -12,10 +12,10 @@
 --  (player_id, event_date) is the primary key of this table.
 --  This table shows the activity of players of some game.
 --  Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
--- -- 該表記錄了遊戲用戶的行為信息，主鍵為(player_id, event_date)的組合。每一行記錄每個遊戲用戶登錄情況以及玩的遊戲數(玩的遊戲可能是0)。
+--  該表記錄了遊戲用戶的行為信息，主鍵為(player_id, event_date)的組合。每一行記錄每個遊戲用戶登錄情況以及玩的遊戲數(玩的遊戲可能是0)。
 
 --  Write an SQL query that reports the fraction of players that logged in again on the day after the day they first logged in,
---  第一次登錄後的"第二天再次登錄"的玩家比例
+--  查詢第一次登錄後的"第二天再次登錄"的玩家比例
 --  rounded to 2 decimal places. In other words, 
 --  四捨五入到小數點後兩位
 --  you need to count the number of players that logged in for at least two consecutive days starting from their first login date, 
@@ -65,19 +65,19 @@ DIFF_ONE_DAY AS (
 SELECT ROUND(SUM(DIFF_DAY) / COUNT(DISTINCT PLAYER_ID), 2) AS FRACTION  
 FROM DIFF_ONE_DAY;
 
+
 -- Solution 2
+-- 找出每列資料各別玩家分別的最初登入日期
+-- 再將每一次登入日期 "減" 各別玩家的最初登入日期
+-- 若是差距為1天的為1否則為0
+-- 將所有差距為1天的資料個數加總"除"玩家總數(去重覆)
 WITH T AS (
-  SELECT PLAYER_ID,
-  -- 找出各別玩家的最初登入日期
-  MIN(EVENT_DATE) OVER (PARTITION BY PLAYER_ID) AS MIN_EVENT_DATE,
-  -- 將每一次登入日期 "減" 各別玩家的最初登入日期
-  -- 若是差距為1天的為1否則為0
-  CASE WHEN (EVENT_DATE - MIN(EVENT_DATE) OVER (PARTITION BY PLAYER_ID) = 1)
-    THEN 1 
-    ELSE 0 
-  END AS DIFF_DAY
+  SELECT PLAYER_ID, EVENT_DATE,  
+	  MIN(EVENT_DATE) OVER (PARTITION BY PLAYER_ID) AS MIN_EVENT_DATE,
+	  CASE WHEN (EVENT_DATE - MIN(EVENT_DATE) OVER (PARTITION BY PLAYER_ID) = 1)
+		THEN 1 ELSE 0
+	  END AS DIFF_DAY
   FROM ACTIVITY
 )
--- 將所有差距為1天的資料加總 "除" 總玩家數(去重覆)
 SELECT ROUND( SUM(T.DIFF_DAY) / COUNT(DISTINCT T.PLAYER_ID), 2) AS FRACTION 
 FROM T;
