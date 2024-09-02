@@ -10,13 +10,14 @@
 --  +---------------+---------+
 --  (business_id, event_type) is the primary key of this table.
 --  Each row in the table logs the info that an event of some type occured at some business for a number of times.
---  表中的每一行都記錄了某種類型的事件(event_type)在商家多次發生的頻率(occurance)
+--  表中的每一行都記錄了某種商業類型的事件(event_type)在商家多次發生的頻率(occurance)
 
---  Write an SQL query to find all active businesses.  
+--  Write an SQL query to find all active businesses.
+--  查詢以查找所有活躍的商業
 --  An active business is a business that has more than one event type 
---  活動商家是指超過一個事件類型
+--  活躍的商業是指超過一個事件類型
 --  with occurences greater than the average occurences of that event type among all businesses.
---  其發生次數大於所有企業中該事件類型的平均發生次數
+--  其發生次數大於所有商業中該事件類型的平均發生次數
 
 --  The query result format is in the following example:
 --  Events table:
@@ -38,8 +39,8 @@
 --  +-------------+
 --  | 1           |
 --  +-------------+ 
---  Average for 'reviews', 'ads'   and 'page views' are 
---             (7+3)/2=5, (11+7+6)/3=8, (3+12)/2=7.5 respectively.
+--  Average for 'reviews','ads'and'page views'are 
+--  (7+3)/2=5, (11+7+6)/3=8, (3+12)/2=7.5 respectively.
 --  Business with id 1 has 7 'reviews' events (more than 5)
 --  and 11 'ads' events (more than 8) so it is an active business.
 
