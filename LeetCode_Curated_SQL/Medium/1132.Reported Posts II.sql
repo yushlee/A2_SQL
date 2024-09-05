@@ -13,8 +13,10 @@
 --  There is no primary key for this table, it may have duplicate rows.
 --  The action column is an ENUM type of ('view', 'like', 'reaction', 'comment', 'report', 'share').
 --  The extra column has optional information about the action such as a reason for report or a type of reaction. 
---  下表中沒有主鍵，因此可能有重複行。action 列可能的值為(查看、喜歡、反應、評論、報告、分享)
---  extra 列不是必須的，包含有關操作的可選信息，例如報告原因或反應類型。
+--  下表中沒有主鍵，因此可能有重複行。
+--  action 列可能的值為(查看、喜歡、反應、評論、報告、分享)
+--  extra 列不是必須的，包含有關操作的可選信息，例如報告原因或反應類型(spam 垃圾郵件、racism 種族主義)
+
 
 --  Table: Removals
 --  +---------------+---------+
@@ -33,7 +35,7 @@
 
 --  The query result format is in the following example:
 --  
---  Actions table:
+--  Table: Actions
 --  spam 垃圾郵件、racism 種族主義
 --  +---------+---------+-------------+--------+--------+
 --  | user_id | post_id | action_date | action | extra  |
@@ -78,20 +80,34 @@
 
 
 -- Solution
-WITH T1 AS(
-  -- SELECT A.ACTION_DATE, A.POST_ID, R.POST_ID    
-  SELECT A.ACTION_DATE, 
-  -- 由於Actions表無主鍵，因此在計數時一定要加 DISTINCT 去除重複
-  -- 垃圾郵件之中被刪除文章的每日百分比(刪除文章數量/垃圾郵件數量)
-  COUNT(DISTINCT R.POST_ID) / COUNT(DISTINCT A.POST_ID) AS RESULT
-  FROM (
-    SELECT ACTION_DATE, POST_ID
-    FROM ACTIONS
-    WHERE EXTRA = 'spam' AND ACTION = 'report'
-  ) A LEFT JOIN REMOVALS R
-  ON A.POST_ID = R.POST_ID
-  GROUP BY A.ACTION_DATE
+-- 以ACTIONS活動資料表為主左外部連接REMOVALS管理員審核資料表透過POST_ID活動編號關聯
+-- 篩選活動為報告'report'、額外類型爲垃圾郵件'spam'
+-- 將資料依照ACTION_DATE活動日期為資料分群
+-- 分別計算每日被審核刪除的垃圾郵件次數，與每日全部的垃圾郵件次數，兩者互除得每日刪除佔比
+-- 最後將全部的每日被刪除垃圾郵件佔比計算最終平均
+WITH T AS (
+	SELECT COUNT(DISTINCT R.POST_ID) / COUNT(DISTINCT A.POST_ID) AVERAGE_DAILY
+	FROM ACTIONS A
+	LEFT JOIN REMOVALS R ON A.POST_ID = R.POST_ID 
+	WHERE A.ACTION = 'report' AND A.EXTRA = 'spam'
+	GROUP BY A.ACTION_DATE
 )
--- 每日百分比平均值
-SELECT ROUND(AVG(T1.RESULT)*100,2) AS AVERAGE_DAILY_PERCENT
-FROM T1;
+SELECT ROUND(AVG(AVERAGE_DAILY) * 100, 2) AS AVERAGE_DAILY_PERCENT 
+FROM T;
+
+
+
+SELECT A.USER_ID, A.POST_ID, A.ACTION_DATE, A.ACTION, A.EXTRA,
+	R.POST_ID, R.REMOVE_DATE
+FROM ACTIONS A
+LEFT JOIN REMOVALS R ON A.POST_ID = R.POST_ID 
+WHERE A.ACTION = 'report' AND A.EXTRA = 'spam'
+
+
+SELECT A.ACTION_DATE, COUNT(DISTINCT R.POST_ID), COUNT(DISTINCT A.POST_ID)
+FROM ACTIONS A
+LEFT JOIN REMOVALS R ON A.POST_ID = R.POST_ID 
+WHERE A.ACTION = 'report' AND A.EXTRA = 'spam'
+GROUP BY A.ACTION_DATE
+
+
