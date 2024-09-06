@@ -1,4 +1,4 @@
--- 1205.Monthly Transactions II
+-- 1205.Monthly Transactions II 每月交易
 
 -- Table: Transactions
 -- +----------------+---------+
@@ -12,10 +12,11 @@
 -- +----------------+---------+
 -- id is the primary key of this table.
 -- The table has information about incoming transactions.
+-- 該表包含有關傳入交易的資訊
 -- The state column is an enum of type ["approved", "declined"].
--- 下表包含一些交易信息，id是此表的主鍵。state 列可能的值為["批准"、"拒絕"]
+-- 下表包含一些交易信息，id是此表的主鍵。state狀態可能的值為["approved批准"、"declined拒絕"]
 
--- Table: Chargebacks
+-- Table: Chargebacks 退款
 -- +----------------+---------+
 -- | Column Name    | Type    |
 -- +----------------+---------+
@@ -31,10 +32,10 @@
 
 -- Write an SQL query to find for each month and country, the number of approved transactions and their total amount,
 -- the number of chargebacks and their total amount.
--- 查詢 "每個月" 和 "國家/地區" 的 '批准' "交易數量" 及其 "總金額"、'退款' "數量"及其"總金額"
+-- 查詢 "每個月" 和 "國家" 的 '批准' "交易數量" 及其 "總金額"、'退款' "數量"及其"總金額"
 
--- Note: In your query, given the month and country, ignore rows with all zeros.
--- 在查詢中，給定月份和國家/地區，請忽略全零的行
+-- Note:In your query, given the month and country, ignore rows with all zeros.
+-- Note:在查詢中，給定月份和國家，請忽略全零的資料行
 
 -- The query result format is in the following example:
 -- Transactions table:
@@ -69,25 +70,6 @@
 
 
 -- Solution
--- Oracle
-WITH T1 AS (
-  SELECT COUNTRY, TRUNC(TRANS_DATE, 'MONTH') DATE_PART, COUNT(*) APPROVED_COUNT, SUM(AMOUNT) APPROVED_AMOUNT
-  FROM TRANSACTIONS
-  WHERE STATE = 'approved'
-  GROUP BY COUNTRY, TRUNC(TRANS_DATE, 'MONTH')
-),
-T2 AS(
-  SELECT T.COUNTRY, TRUNC(C.TRANS_DATE, 'MONTH') DATE_PART, COUNT(*) CHARGEBACK_COUNT, SUM(AMOUNT) CHARGEBACK_AMOUNT
-  FROM CHARGEBACKS C LEFT JOIN TRANSACTIONS T
-  ON C.TRANS_ID = T.ID
-  GROUP BY T.COUNTRY, TRUNC(C.TRANS_DATE, 'MONTH')
-)
-SELECT SUBSTR(NVL(T1.DATE_PART, T2.DATE_PART),0,7) MONTH, NVL(T1.COUNTRY, T2.COUNTRY) COUNTRY, 
-       NVL(T1.APPROVED_COUNT,0) APPROVED_COUNT, NVL(T1.APPROVED_AMOUNT,0) APPROVED_AMOUNT,
-       NVL(T2.CHARGEBACK_COUNT,0) CHARGEBACK_COUNT, NVL(T2.CHARGEBACK_AMOUNT,0) CHARGEBACK_AMOUNT
-FROM T1 FULL JOIN T2 
-ON T1.DATE_PART = T2.DATE_PART AND T1.COUNTRY = T2.COUNTRY;
-
 -- MySQL
 WITH T1 AS (
   SELECT COUNTRY, EXTRACT('month' FROM TRANS_DATE) DATE_PART, STATE, COUNT(*) AS APPROVED_COUNT, SUM(AMOUNT) AS APPROVED_AMOUNT
@@ -114,3 +96,25 @@ T4 AS(
 SELECT * FROM T3
 UNION
 SELECT * FROM T4;
+
+
+-- Oracle
+WITH T1 AS (
+  SELECT COUNTRY, TRUNC(TRANS_DATE, 'MONTH') DATE_PART, COUNT(*) APPROVED_COUNT, SUM(AMOUNT) APPROVED_AMOUNT
+  FROM TRANSACTIONS
+  WHERE STATE = 'approved'
+  GROUP BY COUNTRY, TRUNC(TRANS_DATE, 'MONTH')
+),
+T2 AS(
+  SELECT T.COUNTRY, TRUNC(C.TRANS_DATE, 'MONTH') DATE_PART, COUNT(*) CHARGEBACK_COUNT, SUM(AMOUNT) CHARGEBACK_AMOUNT
+  FROM CHARGEBACKS C LEFT JOIN TRANSACTIONS T
+  ON C.TRANS_ID = T.ID
+  GROUP BY T.COUNTRY, TRUNC(C.TRANS_DATE, 'MONTH')
+)
+SELECT SUBSTR(NVL(T1.DATE_PART, T2.DATE_PART),0,7) MONTH, NVL(T1.COUNTRY, T2.COUNTRY) COUNTRY, 
+       NVL(T1.APPROVED_COUNT,0) APPROVED_COUNT, NVL(T1.APPROVED_AMOUNT,0) APPROVED_AMOUNT,
+       NVL(T2.CHARGEBACK_COUNT,0) CHARGEBACK_COUNT, NVL(T2.CHARGEBACK_AMOUNT,0) CHARGEBACK_AMOUNT
+FROM T1 FULL JOIN T2 
+ON T1.DATE_PART = T2.DATE_PART AND T1.COUNTRY = T2.COUNTRY;
+
+

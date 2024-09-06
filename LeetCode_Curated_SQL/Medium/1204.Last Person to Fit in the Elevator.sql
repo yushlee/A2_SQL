@@ -1,4 +1,4 @@
--- 1204.Last Person to Fit in the Elevator
+-- 1204.Last Person to Fit in the Elevator 最後一個進入電梯的人
 
 -- Table: Queue
 -- +-------------+---------+
@@ -41,25 +41,29 @@
 -- +-------------------+
 -- | Thomas Jefferson  |
 -- +-------------------+
+
 -- Queue table is ordered by turn in the example for simplicity.
 -- In the example George Washington(id 5), John Adams(id 3) and Thomas Jefferson(id 6) will enter the elevator as their weight sum is 250 + 350 + 400 = 1000.
 -- Thomas Jefferson(id 6) is the last person to fit in the elevator because he has the last turn in these three people.
+
 -- 為簡單起見，示例中的隊列表是按順序排列的。
--- 在示例 George Washington(id 5) 中，John Adams(id 3) 和 Thomas Jefferson(id 6) 將進入電梯，因為他們的總重量為 250 + 350 + 400 = 1000。
+-- 在示例 George Washington(id 5) 中，John Adams(id 3) 和 Thomas Jefferson(id 6) 將進入電梯
+-- 因為他們的總重量為 250 + 350 + 400 = 1000。
 -- Thomas Jefferson(id 6) 是最後一個人進電梯
 
 
 -- Solution
-WITH T1 AS (
-  -- 計算累積總計體重
-  SELECT PERSON_NAME, TURN,
-  SUM(WEIGHT) OVER(ORDER BY TURN) AS SUM_WEIGHT
+-- 透過SUM OVER函數計算累積 ORDER BY TURN 總和 WEIGHT 體重
+-- 最後找出隊列中最後一個小於等於1000累積總和體重的TURN(隊列號碼)
+-- 再查詢PERSON_NAME乘員名稱
+WITH T AS (  
+  SELECT PERSON_ID, PERSON_NAME, TURN, WEIGHT,
+	SUM(WEIGHT) OVER (ORDER BY TURN) AS SUM_WEIGHT
   FROM QUEUE
   ORDER BY TURN
 )
-SELECT T1.PERSON_NAME
-FROM T1
-WHERE TURN = (
-  -- 找出隊列中最後一個小於累積總計體重的 TURN(隊列號碼)
-  SELECT MAX(TURN) FROM T1 WHERE T1.SUM_WEIGHT <= 1000
+SELECT T.PERSON_NAME
+FROM T
+WHERE TURN = (  
+  SELECT MAX(TURN) FROM T WHERE SUM_WEIGHT <= 1000
 );
