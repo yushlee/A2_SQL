@@ -1,4 +1,4 @@
--- 1212.Team Scores in Football Tournament
+-- 1212.Team Scores in Football Tournament 足球比賽球隊積分
 
 -- Table: Teams
 -- +---------------+----------+
@@ -10,6 +10,7 @@
 -- team_id is the primary key of this table.
 -- Each row of this table represents a single football team.
 -- team_id是此表的主鍵。該表的每一行代表一個足球隊
+
 
 -- Table: Matches
 -- +---------------+---------+
@@ -80,36 +81,38 @@
 
 
 -- Solution
-WITH T1 AS (
-  -- 計算主隊積分(勝3分、負0分、平局1分)
-  SELECT T.TEAM_ID, M.HOST_GOALS, M.GUEST_GOALS,
-  CASE WHEN M.HOST_GOALS > M.GUEST_GOALS THEN 3
-        WHEN M.HOST_GOALS < M.GUEST_GOALS THEN 0
-       ELSE 1 END POINTS
-  FROM TEAMS T JOIN MATCHES M
-  ON T.TEAM_ID = M.HOST_TEAM
-  ORDER BY T.TEAM_ID
-),
-T2 AS (
-  -- 計算客隊積分(勝3分、負0分、平局1分)
-  SELECT T.TEAM_ID, M.GUEST_GOALS, M.HOST_GOALS, 
-  CASE WHEN M.GUEST_GOALS > M.HOST_GOALS THEN 3
-       WHEN M.GUEST_GOALS < M.HOST_GOALS  THEN 0
-       ELSE 1 END POINTS
-  FROM TEAMS T JOIN MATCHES M
-  ON T.TEAM_ID = M.GUEST_TEAM
-  ORDER BY T.TEAM_ID
-),
-T3 AS (
-  -- 主隊、客隊總積分
-  SELECT TEAM_ID, SUM(POINTS) SUM_POINTS
-  FROM (
-    SELECT T1.TEAM_ID, T1.POINTS FROM T1
-    UNION ALL
-    SELECT T2.TEAM_ID, T2.POINTS FROM T2
-  ) GROUP BY TEAM_ID ORDER BY TEAM_ID
-)
-SELECT T.TEAM_ID, T.TEAM_NAME, NVL(T3.SUM_POINTS, 0) NUM_POINTS
-FROM Teams T LEFT JOIN T3
-ON T.TEAM_ID = T3.TEAM_ID
+-- 此題關鍵在查出來每一隊(TEAM_ID:10 ~ 50)分別在每一場主隊與客隊比賽的計算結果積分
+-- 以TEAMS球隊資料表為主，左外側連接MATCHES比賽結果資料表
+-- 透過TEAM_ID球隊編號與HOST_TEAM主隊編號、GUEST_TEAM客隊編號
+-- 將資料透過TEAM_ID球隊編號、TEAM_NAME球隊名稱將資料分群
+-- 透過CASE WHEN多條件判斷式計算獲得積分
+-- T.TEAM_ID = M.HOST_TEAM 當球隊編號等於主隊編號，M.HOST_GOALS > M.GUEST_GOALS 且主隊得分大於客隊得分則獲得3積分
+-- T.TEAM_ID = M.GUEST_TEAM 當球隊編號等於客隊編號，M.GUEST_GOALS > M.HOST_GOALS 且客隊得分大於主隊得分則獲得3積分
+-- T.TEAM_ID IN (M.HOST_TEAM, M.GUEST_TEAM) 當球隊編號為主隊或客隊編號，M.HOST_GOALS = M.GUEST_GOALS 且主隊得分等於客隊得分則獲得1積分
+-- 透過SUM函數加總各隊總得分積分，最後將資料透過NUM_POINTS總積分降幕排序、T.TEAM_ID球隊編號升序排序
+SELECT T.TEAM_ID, 
+    T.TEAM_NAME,
+    SUM(
+      CASE 
+        WHEN T.TEAM_ID = M.HOST_TEAM  AND M.HOST_GOALS > M.GUEST_GOALS THEN 3
+        WHEN T.TEAM_ID = M.GUEST_TEAM AND M.GUEST_GOALS > M.HOST_GOALS THEN 3
+        WHEN T.TEAM_ID IN (M.HOST_TEAM, M.GUEST_TEAM) AND M.HOST_GOALS = M.GUEST_GOALS THEN 1
+        ELSE 0
+      END
+    ) NUM_POINTS
+FROM TEAMS T LEFT JOIN MATCHES M
+ON T.TEAM_ID = M.HOST_TEAM OR T.TEAM_ID = M.GUEST_TEAM
+GROUP BY T.TEAM_ID, T.TEAM_NAME
 ORDER BY NUM_POINTS DESC, T.TEAM_ID;
+
+
+SELECT T.*, M.*,
+	  CASE 
+		WHEN M.HOST_GOALS > M.GUEST_GOALS AND T.TEAM_ID = M.HOST_TEAM THEN 3 
+		WHEN M.HOST_GOALS < M.GUEST_GOALS AND T.TEAM_ID = M.GUEST_TEAM THEN 3 
+		WHEN M.HOST_GOALS = M.GUEST_GOALS AND T.TEAM_ID IN (M.HOST_TEAM, M.GUEST_TEAM) THEN 1 
+		ELSE 0
+	  END NUM_POINTS
+FROM TEAMS T LEFT JOIN MATCHES M 
+ON T.TEAM_ID = M.HOST_TEAM OR T.TEAM_ID = M.GUEST_TEAM
+ORDER BY T.TEAM_ID;

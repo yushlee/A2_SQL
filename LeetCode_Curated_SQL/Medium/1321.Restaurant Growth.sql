@@ -1,4 +1,4 @@
--- 1321.Restaurant Growth
+-- 1321.Restaurant Growth 餐廳發展
 
 -- Table: Customer
 -- +---------------+---------+
@@ -10,6 +10,7 @@
 -- | amount        | int     |
 -- +---------------+---------+
 -- (customer_id, visited_on) is the primary key for this table.
+-- (customer_id顧客編號, visited_on訪問日期) 是此表的主鍵
 -- This table contains data about customer transactions in a restaurant.
 -- 該表包含一家餐館的顧客交易數據
 -- visited_on is the date on which the customer with ID (customer_id) have visited the restaurant.
@@ -23,10 +24,10 @@
 -- 查詢在7天(當前天+6天之前)內客戶支付的移動平均值
 
 -- Return result table ordered by visited_on.
--- 返回由visited_on排序的結果表
+-- 返回由visited_on排序的結果
 
 -- average_amount should be rounded to 2 decimal places, all dates are in the format ('YYYY-MM-DD').
--- average_amount 應該四捨五入到小數點後兩位，所有日期均採用('YYYY-MM-DD')格式。 
+-- average_amount 應該四捨五入到小數點後兩位，所有日期均採用('YYYY-MM-DD')格式。
 
 -- Customer table:
 -- +-------------+--------------+--------------+-------------+
@@ -68,35 +69,28 @@
 
 
 -- Solution
--- Oracle
-WITH T AS (
-  SELECT VISITED_ON,
-    -- 依據 VISITED_ON 排序"加總" PRECEDING 前6天 AMOUNT
-    SUM(AMOUNT) OVER(ORDER BY VISITED_ON ROWS 6 PRECEDING) AMOUNT,
-    -- 依據 VISITED_ON 排序"平均" PRECEDING 前6天 AMOUNT
-    ROUND(AVG(AMOUNT) OVER(ORDER BY VISITED_ON ROWS 6 PRECEDING),2) AVERAGE_AMOUNT,
-    ROW_NUMBER() OVER (ORDER BY VISITED_ON) ROW_NO
-  FROM (
-    -- 先依據日期 VISITED_ON 做各日加總整合
-    SELECT VISITED_ON, SUM(AMOUNT) AS AMOUNT
-    FROM CUSTOMER
-    GROUP BY VISITED_ON
-    ORDER BY VISITED_ON
-  ) A
-  ORDER BY VISITED_ON
-)
--- 第七天開始返回結果
-SELECT　T.VISITED_ON, T.AMOUNT, T.AVERAGE_AMOUNT
-FROM T WHERE　ROW_NO > 6;
-
--- MySQL
-SELECT VISITED_ON, SUM(AMOUNT) OVER(ORDER BY VISITED_ON ROWS 6 PRECEDING),
-ROUND(AVG(AMOUNT) OVER(ORDER BY VISITED_ON ROWS 6 PRECEDING),2)
-FROM 
-(
+-- 透過GROUP BY VISITED_ON依照顧客照訪日將資料分群,SUM(AMOUNT)計算每日加總消費金額
+-- SUM(AMOUNT) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING) AMOUNT
+-- 依照VISITED_ON照訪日排序計算ROWS 6 PRECEDING移動7天的加總消費金額
+-- ROUND(AVG(AMOUNT) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING), 2) AVERAGE_AMOUNT
+-- 依照VISITED_ON照訪日排序計算ROWS 6 PRECEDING移動7天的平均消費金額，並且四捨五入到小數點後兩位
+-- COUNT(VISITED_ON) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING) COUNT_VISITED
+-- 依照VISITED_ON照訪日排序計算ROWS 6 PRECEDING移動7天的照訪日數量
+-- WHERE COUNT_VISITED = 7 篩選消費日數量有滿7天的資料
+WITH T AS(	
 	SELECT VISITED_ON, SUM(AMOUNT) AS AMOUNT
 	FROM CUSTOMER
 	GROUP BY VISITED_ON
 	ORDER BY VISITED_ON
-) A
-ORDER BY VISITED_ON OFFSET 6 ROWS;
+),
+T1 AS (
+	SELECT VISITED_ON, AMOUNT OROGINAL_AMOUNT,		
+		SUM(AMOUNT) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING) AMOUNT,
+		ROUND(AVG(AMOUNT) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING), 2) AVERAGE_AMOUNT,
+        COUNT(VISITED_ON) OVER (ORDER BY VISITED_ON ROWS 6 PRECEDING) COUNT_VISITED
+	FROM T
+)
+SELECT VISITED_ON, AMOUNT, AVERAGE_AMOUNT
+FROM T1 WHERE COUNT_VISITED = 7;
+
+

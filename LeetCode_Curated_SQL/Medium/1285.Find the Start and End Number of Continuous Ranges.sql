@@ -1,4 +1,4 @@
--- 1285.Find the Start and End Number of Continuous Ranges
+-- 1285.Find the Start and End Number of Continuous Ranges 找出連續範圍的開始和結束編號
 
 -- Table: Logs
 -- +---------------+---------+
@@ -8,6 +8,7 @@
 -- +---------------+---------+
 -- id is the primary key for this table.
 -- Each row of this table contains the ID in a log Table.
+-- 該表的每一行都包含日誌表中的ID
 
 -- Since some IDs have been removed from Logs. Write an SQL query to find the start and end number of continuous ranges in table Logs.
 -- Order the result table by start_id.
@@ -44,20 +45,22 @@
 
 -- 結果表應包含表日誌中的所有範圍
 -- 從 1 到 3 包含在表中
--- 表中缺少從 4 到 6 表
--- 中包含從 7 到 8
+-- 表中缺少從 4 到 6 
+-- 表中包含從 7 到 8
 -- 表中缺少數字 9
 -- 數字 10 包含在表中
 
 
 -- Solution
-SELECT MIN(LOG_ID) AS START_ID, MAX(LOG_ID) AS END_ID
+-- "自身編號"減去排序"欄位列編號"，相差值數字相同表示數字之間為連續編號
+-- 在透過DIFF相差值將資料分群，從中取最小值MIN(LOG_ID)與最大值MAX(LOG_ID)
+-- 即為每個數字群的數值範圍區間
+SELECT MIN(LOG_ID) START_ID, MAX(LOG_ID) END_ID
 FROM (
   SELECT LOG_ID, 
-  ROW_NUMBER() OVER (ORDER BY LOG_ID) ROU_NUMBER,
-  -- "自身編號" 減去 "欄位編號"(數字相同表示為連續編號)
+  ROW_NUMBER() OVER (ORDER BY LOG_ID) ROU_NUMBER,  
   (LOG_ID - ROW_NUMBER() OVER (ORDER BY LOG_ID)) DIFF
   FROM LOGS
-) A
+) T
 GROUP BY DIFF
 ORDER BY START_ID;

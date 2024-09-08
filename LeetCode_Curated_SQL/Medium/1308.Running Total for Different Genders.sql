@@ -1,4 +1,4 @@
--- 1308.Running Total for Different Genders
+-- 1308.Running Total for Different Genders 不同性別的運行總計
 
 -- Table: Scores
 -- +---------------+---------+
@@ -13,9 +13,9 @@
 -- A competition is held between females team and males team.
 -- Each row of this table indicates that a player_name and with gender has scored score_point in someday.
 -- Gender is 'F' if the player is in females team and 'M' if the player is in males team.
--- (性別,日期)是此表的主鍵
+-- (gender性別,day日期)是此表的主鍵
 -- 女子團體與男子團體之間進行比賽
--- 該表的每一行都表示某天某性別的玩家名和得分得分
+-- 表格的每一行表示某玩家姓名和性別在某一天獲得的分數
 -- 如果球員在女子隊伍中，則性別為'F'，如果球員在男子隊伍中，則性別為'M'
 
 -- Write an SQL query to find the total score for each gender at each day.
@@ -82,6 +82,9 @@
 
 
 -- Solution
+-- 使用SUM OVER函數累計總合SCORE_POINTS得分
+-- PARTITION BY GENDER 透過依性別資料劃分(F、M 資料分群)
+-- ORDER BY DAY 達成按照日期排序累計總合
 SELECT GENDER, DAY,
   SUM(SCORE_POINTS) OVER(PARTITION BY GENDER ORDER BY DAY) AS TOTAL
 FROM SCORES;

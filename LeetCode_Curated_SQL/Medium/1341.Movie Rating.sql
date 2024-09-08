@@ -1,4 +1,4 @@
--- 1341.Movie Rating
+-- 1341.Movie Rating 電影分級
 
 -- Table: Movies
 -- +---------------+---------+
@@ -9,6 +9,7 @@
 -- +---------------+---------+
 -- movie_id is the primary key for this table.
 -- title is the name of the movie.
+-- title 是電影的名稱
 
 -- Table: Users
 -- +---------------+---------+
@@ -18,8 +19,6 @@
 -- | name          | varchar |
 -- +---------------+---------+
 -- user_id is the primary key for this table.
-
-
 
 -- Table: Movie_Rating
 -- +---------------+---------+
@@ -31,7 +30,7 @@
 -- | created_at    | date    |
 -- +---------------+---------+
 -- (movie_id, user_id) is the primary key for this table.
--- (movie_id，user_id)是此表的主鍵
+-- (movie_id 電影編號，user_id 使用者編號)是此表的主鍵
 -- This table contains the rating of a movie by a user in their review.
 -- 該表包含用戶在其評論中對電影的評分
 -- created_at is the user's review date. 
@@ -68,7 +67,7 @@
 -- +-------------+--------------+
 
 
--- Movie_Rating table:
+-- MovieRating table:
 -- +-------------+--------------+--------------+-------------+
 -- | movie_id    | user_id      | rating       | created_at  |
 -- +-------------+--------------+--------------+-------------+
@@ -93,65 +92,50 @@
 -- +--------------+
 
 -- Daniel and Maria have rated 3 movies ("Avengers", "Frozen 2" and "Joker") but Daniel is smaller lexicographically.
--- 丹尼爾(Daniel)和莫妮卡(Monica)都對3部電影進行了評分（"復仇者聯盟"，"冰雪奇緣2"和"小丑"），但丹尼爾在詞典上順序靠前
+-- 丹尼爾(Daniel)和莫妮卡(Monica)都對3部電影進行了評分（"Avengers復仇者聯盟"，"Frozen 2冰雪奇緣2"和"Joker小丑"），但丹尼爾在詞典上順序靠前
 -- Frozen 2 and Joker have a rating average of 3.5 in February but Frozen 2 is smaller lexicographically.
 -- 《冰雪奇緣2》和《小丑》在2月的平均評分為3.5，但《冰雪奇緣2》在字典上順序靠前
 
 
 -- Solution
--- Oracle
+-- USERS使用者資料表與MovieRating電影評分資料表透過USER_ID使用者編號關聯
+-- 將資料依照U.USER_ID使用者編號、U.NAME使用者名稱將資料分群
+-- 並將資料依照COUNT(MR.MOVIE_ID)評論數量降幕排序、U.NAME使用者名稱升幕排序
+-- LIMIT 1只取第一筆獲取評論數量最多的用戶
+-- MOVIES電影資料表與MovieRating電影評分資料表透過MOVIE_ID電影編號關聯
+-- 將資料依照M.MOVIE_ID電影編號、M.TITLE電影名稱將資料分群
+-- 並將資料依照AVG(MR.RATING)平均評分降幕排序、M.TITLE電影名稱升幕排序
+-- LIMIT 1只取第一筆獲取2020年2月平均評分最高的電影
 (
-  SELECT NAME RESULTS FROM (
-    -- 查找評論電影數量最多的"用戶名"。如果數量相同，則按用戶名升序排序
-    SELECT U.USER_ID, U.NAME,
-          COUNT(U.USER_ID),
-          ROW_NUMBER()OVER(ORDER BY COUNT(U.USER_ID) DESC, U.NAME) ROWNO
-    FROM MOVIE_RATING MR JOIN USERS U
-    ON MR.USER_ID = U.USER_ID  
-    GROUP BY U.USER_ID, U.NAME
-    ORDER BY COUNT(U.USER_ID) DESC, U.NAME
-  ) WHERE ROWNO = 1 
+	SELECT NAME AS RESULTS
+	FROM USERS U
+	JOIN MOVIERATING MR ON U.USER_ID = MR.USER_ID
+	GROUP BY U.USER_ID, U.NAME
+	ORDER BY COUNT(MR.MOVIE_ID) DESC, U.NAME ASC
+	LIMIT 1
 )
-UNION 
+UNION ALL
 (
-  SELECT TITLE RESULTS FROM (
-    -- 查找"2020年2月"平均評分最高的"電影名稱"。如果評分相同，則按電影名升序排序
-    SELECT MR.MOVIE_ID, M.TITLE,
-          AVG(RATING),
-          ROW_NUMBER()OVER(ORDER BY AVG(MR.RATING) DESC, M.TITLE) ROWNO
-    FROM MOVIE_RATING MR JOIN MOVIES M
-    ON MR.MOVIE_ID = M.MOVIE_ID
-    AND MR.CREATED_AT LIKE '2020-02%'
-    GROUP BY MR.MOVIE_ID, M.TITLE
-    ORDER BY AVG(MR.RATING) DESC, M.TITLE
-  ) WHERE ROWNO = 1  
-)
+	SELECT TITLE AS RESULTS
+	FROM MOVIES M
+	JOIN MOVIERATING MR ON M.MOVIE_ID = MR.MOVIE_ID
+	WHERE DATE_FORMAT(MR.CREATED_AT,'%Y-%m') = '2020-02'
+	GROUP BY M.MOVIE_ID, M.TITLE
+	ORDER BY AVG(MR.RATING) DESC, M.TITLE ASC
+	LIMIT 1
+ );
 
--- MySQL
-SELECT NAME AS RESULTS
-FROM(
-  (
-    SELECT A.NAME FROM(    
-      SELECT NAME, COUNT(*),
-      RANK() OVER(ORDER BY COUNT(*) DESC) AS RK
-      FROM MOVIE_RATING M
-      JOIN USERS U 
-      ON M.USER_ID = U.USER_ID
-      GROUP BY NAME, M.USER_ID
-      ORDER BY RK, NAME
-    ) A LIMIT 1    
-  )
-  UNION
-  (
-    SELECT TITLE FROM(    
-      SELECT TITLE, ROUND(AVG(RATING),1) AS RND
-      FROM MOVIE_RATING M
-      JOIN MOVIES U
-      ON M.MOVIE_ID = U.MOVIE_ID
-      WHERE MONTH(CREATED_AT) = 2
-      GROUP BY TITLE
-      ORDER BY RND DESC, TITLE
-      ) B LIMIT 1      
-  )
-) AS D;
 
+SELECT U.USER_ID, U.NAME, COUNT(MR.MOVIE_ID)
+FROM USERS U
+JOIN MOVIERATING MR ON U.USER_ID = MR.USER_ID
+GROUP BY U.USER_ID, U.NAME
+ORDER BY COUNT(MR.MOVIE_ID) DESC, U.NAME ASC;
+
+
+SELECT M.MOVIE_ID, M.TITLE, AVG(MR.RATING)
+FROM MOVIES M
+JOIN MOVIERATING MR ON M.MOVIE_ID = MR.MOVIE_ID
+WHERE DATE_FORMAT(MR.CREATED_AT,'%Y-%m') = '2020-02'
+GROUP BY M.MOVIE_ID, M.TITLE
+ORDER BY AVG(MR.RATING) DESC, M.TITLE ASC;
