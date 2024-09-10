@@ -10,7 +10,7 @@
 -- +---------------+---------+
 -- (id, year) is the primary key of this table.
 -- The table has information about the id and the year of each inventory and the corresponding net present value.
--- 該表包含有關每個庫存的編號和年份以及相應的淨現值(npv)的信息 
+-- 該表包含有關每個庫存的編號和年份以及相應的淨現值(npv)的信息
 
 
 -- Table: Queries
@@ -71,10 +71,17 @@
 -- +------+--------+--------+
 -- The npv value of (7, 2018) is not present in the NPV table, we consider it 0.
 -- The npv values of all other queries can be found in the NPV table.
+-- NPV 表中沒有 (7, 2018) 的 npv 值，我們將其視為 0
+-- 所有其他查詢的 npv 值都可以在 NPV 表中找到
+
 
 
 -- Solution
-SELECT Q.ID, Q.YEAR, NVL(N.NPV, 0) NPV
+-- 以QUERIES庫存查詢資料表為主左外側連接NPV淨現值資料表
+-- 透過ID查詢編號、YEAR查詢年份兩個欄位關聯
+-- 因為在QUERIES資料表中的資料可能不存於於NPV淨現值資料表
+-- 所以NPV使用IFNULL函數處理資料為NULL時預設值為0
+SELECT Q.ID, Q.YEAR, IFNULL(N.NPV, 0) NPV
 FROM QUERIES Q
 LEFT JOIN NPV N
 ON Q.ID = N.ID AND Q.YEAR = N.YEAR
