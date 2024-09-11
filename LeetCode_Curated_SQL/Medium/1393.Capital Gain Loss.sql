@@ -14,8 +14,8 @@
 -- Each row of this table indicates that the stock which has stock_name had an operation on the day operation_day with the price.
 -- It is guaranteed that each 'Sell' operation for a stock has a corresponding 'Buy' operation in a previous day.
 -- 操作列是ENUM類型('出售'，'購買')
--- 該表的每一行指示具有stock_name 的股票在operation_day 進行了一次操作
--- 可以保證股票的每個“賣出”操作在前一天都有一個對應的“買入”操作
+-- 該表的每一行代表stock_name的股票在operation_day 這一天的操作價格
+-- 可以保證股票的每個"賣出"操作在前一天都有一個對應的"買入"操作
 
 
 -- Write an SQL query to report the Capital gain/loss for each stock.
@@ -63,11 +63,20 @@
 -- Corona Masks 股票：在第1天以10$的價格購買，第3天以1010$的價格出售；
 -- 在第4天再次以1000$的價格購買，並在第5天以500$的價格出售；
 -- 最後，在第6天以1000$的價格購買，並在第10天以10000$的價格出售。
--- 資本損益是每個('購買'->'賣出')操作的
+-- 資本損益是每個('購買' --> '賣出')操作的
 -- 資本損益之和 = (1010-10)+(500-1000)+(10000-1000) = 1000 - 500 + 9000 = 9500$
 
 
 -- Solution
+-- 透過STOCK_NAME股票名稱資料分群
+-- SUM函數搭配IF判斷函式當OPERATION值為'Sell'時代表為賣出取PRICE加項
+-- 否則為買入取-PRICE減項，全部加總即為最後的投資損益
+SELECT STOCK_NAME, 
+    SUM(IF(OPERATION = 'Sell', PRICE, -PRICE)) CAPITAL_GAIN_LOSS
+FROM STOCKS 
+GROUP BY STOCK_NAME;
+
+
 -- 賣出總金額 - 買入總金額 = 資本損益
 SELECT STOCK_NAME, (ONE-TWO) AS CAPITAL_GAIN_LOSS
 FROM(
