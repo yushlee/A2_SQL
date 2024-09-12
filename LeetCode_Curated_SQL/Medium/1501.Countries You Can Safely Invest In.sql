@@ -1,6 +1,6 @@
--- 1501.Countries You Can Safely Invest In
+-- 1501.Countries You Can Safely Invest In 可以放心投資的國家
 
--- Table Person:
+-- Table: Person
 -- +----------------+---------+
 -- | Column Name    | Type    |
 -- +----------------+---------+
@@ -16,7 +16,7 @@
 -- 電話號碼的格式為'xxx-yyyyyyy'，其中xxx是國家/地區代碼（3個字符），
 -- 而yyyyyyy是電話號碼（7個字符），其中x和y是數字。兩者都可以以0開頭。
 
--- Table Country:
+-- Table: Country
 -- +----------------+---------+
 -- | Column Name    | Type    |
 -- +----------------+---------+
@@ -28,7 +28,7 @@
 -- 該表的每一行均包含國家名稱及其代碼。country_code 的格式為'xxx'，其中x為數字
  
 
--- Table Calls:
+-- Table: Calls
 -- +-------------+------+
 -- | Column Name | Type |
 -- +-------------+------+
@@ -110,54 +110,18 @@
 
 
 -- Solution One
--- Oracle
-WITH CALL_TIME AS (
-  -- 查詢所有 CALLER、CALLEE 所有的通話時間
-  SELECT CALLER_ID CALL_ID, DURATION
-  FROM CALLS
-  UNION ALL
-  SELECT CALLEE_ID CALL_ID, DURATION
-  FROM CALLS
-),
-PERSON_COUNTRY AS (
-  -- 查詢 PERSON 所在的 COUNTRY 資料
-  SELECT P.ID, C.COUNTRY_CODE, C.NAME COUNTRY_NAME
-  FROM (
-    SELECT ID, SUBSTR(PHONE_NUMBER,0,3) PRE_CODE
-    FROM PERSON P
-  ) P JOIN COUNTRY C
-  ON P.PRE_CODE = C.COUNTRY_CODE
-)
-SELECT COUNTRY_NAME COUNTRY FROM (
-  -- 查詢每個PERSON在每個國家，於每個國家計算平均通話時間，全球平均通話時間
-  SELECT DISTINCT P.COUNTRY_NAME,
-    AVG(C.DURATION) OVER (PARTITION BY P.COUNTRY_CODE) COUNTRY_AVG,
-    AVG(C.DURATION) OVER() AS GLOBAL_AVG
-  FROM CALL_TIME C JOIN PERSON_COUNTRY P
-  ON C.CALL_ID = P.ID
-) WHERE COUNTRY_AVG > GLOBAL_AVG;
+SELECT CO.NAME COUNTRY
+FROM CALLS CA
+JOIN PERSON P ON CA.CALLER_ID = P.ID OR CA.CALLEE_ID = P.ID
+JOIN COUNTRY CO ON CO.COUNTRY_CODE = SUBSTR(P.PHONE_NUMBER, 1, 3)
+GROUP BY CO.NAME
+HAVING AVG(CA.DURATION) > (SELECT AVG(DURATION) FROM CALLS);
 
--- MySQL
-WITH T1 AS(
-  SELECT CALLER_ID AS ID, DURATION AS TOTAL
-  FROM (
-    SELECT CALLER_ID, DURATION
-    FROM CALLS
-    UNION ALL
-    SELECT CALLEE_ID, DURATION
-    FROM CALLS
-  ) A
-)
-SELECT NAME AS COUNTRY 
-FROM (
-  SELECT DISTINCT AVG(TOTAL) OVER(PARTITION BY CODE) AS AVG_CALL, AVG(TOTAL) OVER() AS GLOBAL_AVG, C.NAME
-  FROM (
-    (
-      SELECT *, COALESCE(TOTAL,0) AS DURATION, SUBSTRING(PHONE_NUMBER FROM 1 FOR 3) AS CODE
-      FROM PERSON RIGHT JOIN T1
-      USING (ID)
-    ) B JOIN COUNTRY C    
-    ON C.COUNTRY_CODE = B.CODE
-  )
-) D
-WHERE AVG_CALL > GLOBAL_AVG;
+
+SELECT CA.CALLER_ID, CA.CALLEE_ID, CA.DURATION, 
+	P.ID, P.PHONE_NUMBER,
+	CO.NAME, CO.COUNTRY_CODE
+FROM CALLS CA
+JOIN PERSON P ON CA.CALLER_ID = P.ID OR CA.CALLEE_ID = P.ID
+JOIN COUNTRY CO ON CO.COUNTRY_CODE = SUBSTR(P.PHONE_NUMBER, 1, 3)
+ORDER BY CO.COUNTRY_CODE;

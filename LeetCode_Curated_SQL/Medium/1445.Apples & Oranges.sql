@@ -14,7 +14,7 @@
 
 -- Write an SQL query to report the difference between number of apples and oranges sold each day.
 -- Return the result table ordered by sale_date in format ('YYYY-MM-DD').
--- 查詢以報告每天售出的蘋果和橙子數量之間的差異，結果按照返sale_date升序排序
+-- 查詢以報告每天售出的蘋果和橙子數量之間的差異，結果按照返sale_date升序排序，日期格式'YYYY-MM-DD'
 
 -- Sales table:
 -- +------------+------------+-------------+
@@ -47,6 +47,16 @@
 
 
 -- Solution
+-- 透過SALE_DATE出售日將資料分群
+-- 使用SUM函數搭配IF判斷式，當FRUIT值為'apples'時值為加項SOLD_NUM否則為減項-SOLD_NUM
+-- 最終加總即為每天售出的蘋果'apples'和橙子'oranges'數量之間的差異
+SELECT SALE_DATE,
+    SUM(IF(FRUIT = 'apples', SOLD_NUM, -SOLD_NUM)) DIFF
+FROM SALES
+GROUP BY SALE_DATE;
+
+
+
 SELECT SA.SALE_DATE, (SA.SOLD_NUM - SO.SOLD_NUM) DIFF
 FROM (
   -- 查詢'apples'出售日、售價

@@ -1,6 +1,6 @@
--- 1468.Calculate Salaries
+-- 1468.Calculate Salaries 計算工資
 
--- Table Salaries:
+-- Table: Salaries
 -- +---------------+---------+
 -- | Column Name   | Type    |
 -- +---------------+---------+
@@ -11,17 +11,17 @@
 -- +---------------+---------+
 -- (company_id, employee_id) is the primary key for this table.
 -- This table contains the company id, the id, the name and the salary for an employee.
+-- 表格包含公司 ID、員工 ID、姓名和薪資。
 
 -- Write an SQL query to find the salaries of the employees after applying taxes.
+-- 查找每個員工的稅後工資
 
 -- The tax rate is calculated for each company based on the following criteria:
-
 -- 0% If the max salary of any employee in the company is less than 1000$.
 -- 24% If the max salary of any employee in the company is in the range [1000, 10000] inclusive.
 -- 49% If the max salary of any employee in the company is greater than 10000$.
 -- Return the result table in any order. Round the salary to the nearest integer.
---  查找每個員工的稅後工資
---  每個公司的稅率計算依照以下規則
+--  每個公司的稅率根據以下標準計算
 --  如果這個公司員工最高工資不到 1,000，稅率為 0% 
 --  如果這個公司員工最高工資在 1,000 到 10,000 之間，稅率為 24% 
 --  如果這個公司員工最高工資大於 10,000，稅率為 49%
@@ -77,24 +77,31 @@
 
 
 -- Solution One
-WITH T1 AS (
-  -- 查詢各公司的員工"最高薪資"所對應的"稅率"
-  SELECT COMPANY_ID, MAX(SALARY),
-         --  不到 1,000，稅率為 0%
-    CASE WHEN (MAX(SALARY) < 1000) THEN 0
-         --  在 1,000 到 10,000 之間，稅率為 24% 
-         WHEN (MAX(SALARY) BETWEEN 1000 AND 10000) THEN (24/100)
-         --  大於 10,000，稅率為 49%
-         WHEN (MAX(SALARY) > 1000) THEN (49/100)
-         END RATE
-  FROM SALARIES
+-- 透過COMPANY_ID公司編號將資料分群
+-- 使用CASE WHEN多條件判斷式查詢各公司的員工"最高薪資"所對應的"稅率"
+-- 資料結果儲存至暫存表T
+-- 不到 1,000，稅率為 0%
+-- 在 1,000 到 10,000 之間，稅率為 24% 
+-- 大於 10,000，稅率為 49%
+-- 暫存表T與SALARIES工資資料表透過COMPANY_ID公司編號欄位關聯查詢
+-- 計算稅後工資
+-- 工資 - 工資 * (稅率 / 100) = 稅後工資
+WITH T AS (  
+  SELECT COMPANY_ID, MAX(SALARY),         
+    CASE 		
+		WHEN MAX(SALARY) < 1000 THEN 0        
+        WHEN MAX(SALARY) BETWEEN 1000 AND 10000 THEN 0.24        
+        WHEN MAX(SALARY) > 1000 THEN 0.49
+	END RATE
+  FROM SALARIES  
   GROUP BY COMPANY_ID
 )
-SELECT S.COMPANY_ID, S.EMPLOYEE_ID, S.EMPLOYEE_NAME,
--- 工資 - 工資 * (稅率 / 100) = 稅後工資計算
-ROUND(S.SALARY - S.SALARY * T.RATE) SALARY
-FROM T1 T JOIN SALARIES S
+SELECT S.COMPANY_ID, S.EMPLOYEE_ID, S.EMPLOYEE_NAME,	
+	ROUND(S.SALARY - S.SALARY * T.RATE) SALARY
+FROM T JOIN SALARIES S
 ON T.COMPANY_ID = S.COMPANY_ID;
+
+
 
 -- Solution Two
 WITH T1 AS (
