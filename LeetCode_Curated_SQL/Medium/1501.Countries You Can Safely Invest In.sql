@@ -110,6 +110,15 @@
 
 
 -- Solution One
+-- CALLS通話紀錄資料表與PERSON用戶資料表
+-- 透過P.ID用戶編號與CA.CALLER_ID呼叫者編號或CA.CALLEE_ID被呼叫者編號
+-- 查詢關聯出所有的通話紀錄結果
+-- PERSON用戶資料表與COUNTRY國家資料表
+-- 透過CO.COUNTRY_CODE國家代碼與P.PHONE_NUMBER電話號碼前三碼
+-- 查詢關聯出所有的國家地區
+-- 透過CO.NAME國家名稱將資料分群
+-- 透過HAVING篩選AVG(CA.DURATION)各別國家的平均通話時長
+-- 大於全球平均通話時長SELECT AVG(DURATION) FROM CALLS
 SELECT CO.NAME COUNTRY
 FROM CALLS CA
 JOIN PERSON P ON CA.CALLER_ID = P.ID OR CA.CALLEE_ID = P.ID
