@@ -1,8 +1,8 @@
--- 615.Average Salary: Departments VS Company
+-- 615.Average Salary: Departments VS Company 平均薪資：部門 VS 公司
 
 -- Given two tables as below, write a query to display the comparison result (higher/lower/same) of the 
 -- average salary of employees in a department to the company's average salary.
--- 查詢各部門平均工資(月)與公司平均工資(月)的比較結果（高/低/相同）
+-- 查詢各部門平均工資(月)與公司平均工資(月)的比較結果(高/低/相同)
 
 -- Table: salary
 -- | id | employee_id | amount | pay_date   |
@@ -49,32 +49,30 @@
 
 
 -- Solution
--- Oracle
-WITH T AS (
-  SELECT TO_CHAR(S.PAY_DATE, 'yyyy-MM') PAY_MONTH, E.DEPARTMENT_ID,
-    AVG(S.AMOUNT) OVER (PARTITION BY TO_CHAR(S.PAY_DATE, 'yyyy-MM'), E.DEPARTMENT_ID) AVG_DEP,
-    AVG(S.AMOUNT) OVER (PARTITION BY TO_CHAR(S.PAY_DATE, 'yyyy-MM')) COMP_DEP
+-- SALARY薪資資料表與EMPLOYEE員工資料表，透過EMPLOYEE_ID關聯查詢
+-- PAY_DATE薪資日期取年月
+-- 資料劃分透過S.PAY_DATE薪資日期取年月、E.DEPARTMENT_ID部門編號，計算取得部門平均月薪資
+-- 資料劃分透過S.PAY_DATE薪資日期取年月，計算取得公司平均月薪資
+-- 透過CASE WHEN多條件判斷式
+-- 當DEPT_AVG > COMP_AVG 部門平均月薪資大於公司平均月薪資為"higher"
+-- 當DEPT_AVG < COMP_AVG 部門平均月薪資小於公司平均月薪資為"lower"
+-- 上述情皆不是則為"same"
+-- 最後將欄位PAY_MONTH薪資日期年月、DEPARTMENT_ID部門號、COMPARISON比較結果，資料去重覆
+WITH T AS(
+  SELECT DATE_FORMAT(S.PAY_DATE,'%Y-%m') AS PAY_MONTH, E.DEPARTMENT_ID, 
+	  AVG(S.AMOUNT) OVER (PARTITION BY DATE_FORMAT(S.PAY_DATE,'%Y-%m'), E.DEPARTMENT_ID) AS DEPT_AVG, 
+	  AVG(S.AMOUNT) OVER (PARTITION BY DATE_FORMAT(S.PAY_DATE,'%Y-%m')) AS COMP_AVG
   FROM SALARY S JOIN EMPLOYEE E
-  ON S.EMPLOYEE_ID = E.EMPLOYEE_ID  
-)
-SELECT DISTINCT PAY_MONTH, DEPARTMENT_ID,
-  CASE WHEN AVG_DEP > COMP_DEP THEN 'higher'
-       WHEN AVG_DEP < COMP_DEP THEN 'lower'
-       ELSE 'same' END COMPARISON
-FROM T ORDER BY PAY_MONTH DESC;
-
--- MySQL
-WITH T1 AS(
-  SELECT DATE_FORMAT(PAY_DATE,'%Y-%m') AS PAY_MONTH, DEPARTMENT_ID, 
-  AVG(AMOUNT) OVER(PARTITION BY MONTH(PAY_DATE),DEPARTMENT_ID) AS DEPT_AVG, 
-  AVG(AMOUNT) OVER(PARTITION BY MONTH(PAY_DATE)) AS COMP_AVG
-  FROM SALARY S JOIN EMPLOYEE E
-  USING (EMPLOYEE_ID)
+  ON S.EMPLOYEE_ID = E.EMPLOYEE_ID
+  ORDER BY PAY_MONTH DESC
 )
 SELECT DISTINCT PAY_MONTH, DEPARTMENT_ID, 
-CASE WHEN DEPT_AVG>COMP_AVG THEN "higher"
-WHEN DEPT_AVG = COMP_AVG THEN "same"
-ELSE "lower"
-END AS COMPARISON
-FROM T1
+	CASE 
+		WHEN DEPT_AVG > COMP_AVG THEN "higher"
+		WHEN DEPT_AVG < COMP_AVG THEN "lower"
+		ELSE "same"
+	END AS COMPARISON
+FROM T
 ORDER BY PAY_MONTH DESC;
+
+
