@@ -1,5 +1,5 @@
--- 1412.Find the Quiet Students in All Exams
--- 查找成績處於中間的學生
+-- 1412.Find the Quiet Students in All Exams 查找成績處於中間的學生
+
 
 -- Table: Student
 -- +---------------------+---------+
@@ -25,10 +25,10 @@
 -- (exam_id, student_id)是此表的主鍵，score 表示該學生在本場考試中的成績 
 
 -- A "quite" student is the one who took at least one exam and didn't score neither the high score nor the low score.
--- "quite" student 是至少參加了一次考試"並且既未獲得高分也未獲得低分"的學生
+-- 成績處於中間的學生是指至少參加了一次測驗, 且得分既不是最高分也不是最低分的學生。
 
 -- Write an SQL query to report the students (student_id, student_name) being "quiet" in ALL exams.
--- 查詢在所有考試中 quite student，返回student_id 及student_name
+-- 寫一個SQL 語句，找出在所有測驗中都處於中間的學生(student_id, student_name)
 
 -- Don't return the student who has never taken any exam. Return the result table ordered by student_id.
 -- The query result format is in the following example.
@@ -81,38 +81,23 @@
 -- 由於學生5不參加任何考試，因此將他從成績中排除。因此，我們僅返回學生2的信息
 
 
--- Solution One
-WITH T AS (
-  -- 所有獲得最高分、最低分的學生
-  SELECT DISTINCT STUDENT_ID FROM (
-    SELECT EXAM_ID, STUDENT_ID, SCORE,
-      MAX(SCORE) OVER (PARTITION BY EXAM_ID) MAX_SCORE,
-      MIN(SCORE) OVER (PARTITION BY EXAM_ID) MIN_SCORE
-    FROM EXAM
-  ) WHERE SCORE = MAX_SCORE OR SCORE = MIN_SCORE  
+-- Solution
+-- 解題重點在於用RANK函數算出正排名和倒數排名，再篩選排除第一名、倒數第一名的學生
+-- EXAM測試成績資料表與STUDENT學生資料表，透過STUDENT_ID學生編號關聯查詢
+-- 透過E.EXAM_ID測驗編號將資料劃分，並按照E.SCORE測試成績降幕和升幕排序
+-- 取得所有測驗成績的RNAK名次第一名與倒數第一名
+-- 透過兩個欄位STUDENT_ID學生編號、STUDENT_NAME學生編號將資料分群
+-- HAVING資料篩選MIN(RANK_EAXM_DESC) != 1排除成績第一名、MIN(RANK_EAXM_ASC) != 1倒數成績第一名的學生
+WITH T AS(
+  SELECT E.EXAM_ID, E.STUDENT_ID, S.STUDENT_NAME, E.SCORE, 
+    RANK() OVER (PARTITION BY E.EXAM_ID ORDER BY E.SCORE DESC) RANK_EAXM_DESC, 
+    RANK() OVER (PARTITION BY E.EXAM_ID ORDER BY E.SCORE ASC) RANK_EAXM_ASC
+  FROM EXAM E
+  JOIN STUDENT S ON E.STUDENT_ID = S.STUDENT_ID
 )
-SELECT S.STUDENT_ID, S.STUDENT_NAME FROM (
-  -- 所有考過試的學生"減去"所有獲得最高分、最低分的學生
-  -- 等於剩下中間分數的學生
-  SELECT DISTINCT STUDENT_ID FROM EXAM
-  MINUS
-  SELECT STUDENT_ID FROM T
-) E JOIN STUDENT S ON E.STUDENT_ID = S.STUDENT_ID;
+SELECT STUDENT_ID, STUDENT_NAME
+FROM T
+GROUP BY STUDENT_ID, STUDENT_NAME
+HAVING MIN(RANK_EAXM_DESC) != 1 AND MIN(RANK_EAXM_ASC) != 1
+ORDER BY STUDENT_ID;
 
--- Solution Two
-WITH T AS (
-  SELECT STUDENT_ID  FROM (
-    -- 學生3雖在 EXAM_ID:30為中間，但在EXAM_ID:10得過第一名，所以必須排除
-    SELECT EXAM_ID, STUDENT_ID, SCORE,
-      RANK() OVER(PARTITION BY EXAM_ID ORDER BY SCORE DESC ) SCORE_DESC,
-      RANK() OVER(PARTITION BY EXAM_ID ORDER BY SCORE ASC) SCORE_ASC
-    FROM EXAM
-    ORDER BY STUDENT_ID
-  ) GROUP BY STUDENT_ID
-  -- 未曾經得過第一名和最後一名
-  HAVING MIN(SCORE_DESC) != 1  AND MIN(SCORE_ASC) != 1
-)
-SELECT S.STUDENT_ID, S.STUDENT_NAME
-FROM T JOIN STUDENT S 
-ON T.STUDENT_ID = S.STUDENT_ID
-ORDER BY S.STUDENT_ID;

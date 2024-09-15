@@ -25,7 +25,7 @@
 -- Each row is a record of a match, first_player and second_player contain the player_id of each match.
 -- 每行是一場比賽的記錄，first_player 和 second_player 包含每場比賽的 player_id。
 -- first_score and second_score contain the number of points of the first_player and second_player respectively.
--- first_score 和 second_score 分別包含 first_player 和 second_player 的點數。
+-- first_score 和 second_score 分別包含 first_player 和 second_player 的得分。
 -- You may assume that, in each match, players belongs to the same group.
 -- 您可以假設，在每場比賽中，玩家都屬於同一組。 
 
@@ -33,7 +33,7 @@
 -- The winner in each group is the player who scored the maximum total points within the group. In the case of a tie, 
 -- the lowest player_id wins.
 -- Write an SQL query to find the winner in each group.
--- 每個組中的獲勝者是得分最高的人。如果是平局，則player_id 編號小的獲勝。查詢每個組中的獲勝者。
+-- 查詢每個組中的獲勝者是得分最高的人。如果是平局，則player_id 編號小的獲勝。查詢每個組中的獲勝者。
 
 
 -- Players table:

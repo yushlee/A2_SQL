@@ -1,4 +1,4 @@
--- 1336.Number of Transactions per Visit
+-- 1336.Number of Transactions per Visit 每次訪問的交易數量
 
 -- Table: Visits
 -- +---------------+---------+
@@ -33,13 +33,13 @@
 -- 查詢有多少用戶訪問了銀行並且沒有進行任何交易，有多少用戶訪問了銀行並進行了一次交易等等。
 
 -- The result table will contain two columns:
--- 結果表將包含兩列：
+-- 結果表將包含兩欄：
 
 -- 1.transactions_count which is the number of transactions done in one visit.
--- transaction_count 是一次訪問完成的交易數
+-- 1.transaction_count 是一次訪問完成的交易數
 
 -- 2.visits_count which is the corresponding number of users who did transactions_count in one visit to the bank.
--- visits_count 是一次訪問銀行交易次數為 transaction_count 的用戶數
+-- 2.visits_count 是一次訪問銀行交易次數為 transaction_count 的用戶數
 
 -- transactions_count should take all values from 0 to max(transactions_count) done by one or more users.
 -- transactions_count 取值區間為0至一個或多個用戶完成最多交易數(transactions_count)
@@ -102,63 +102,43 @@
 
 
 -- Solution
-WITH TRANS AS (
-  -- VISITS表為基礎並依照USER_ID、VISIT_DATE資料劃分，將有交易的AMOUNT做COUNT數量
-  -- 藉以得知每位顧客在每天交易的次數
-  SELECT V.USER_ID || '_' || V.VISIT_DATE USER_VISIT_DATE, T.AMOUNT,
-    COUNT(T.AMOUNT) OVER(PARTITION BY V.USER_ID, V.VISIT_DATE) TRANSACTIONS_COUNT    
-  FROM VISITS V LEFT JOIN TRANSACTIONS T
-  ON V.USER_ID = T.USER_ID AND V.VISIT_DATE = T.TRANSACTION_DATE
-  ORDER BY TRANSACTIONS_COUNT, V.USER_ID, V.VISIT_DATE
-),
-TRANSACTIONS_VISITS_COUNT AS (
-  -- 同一個顧客於同一天交易的訪問次數只能算一次，所以要DISTINCT去重覆
-  SELECT TRANSACTIONS_COUNT, COUNT(DISTINCT USER_VISIT_DATE) VISITS_COUNT
-  FROM TRANS
-  GROUP BY TRANSACTIONS_COUNT
-  ORDER BY TRANSACTIONS_COUNT
-),
-CONTINUOUS AS (
-  -- 建立一個連續交易次數的暫存表
-  SELECT 0 TRANSACTIONS_COUNT FROM DUAL
-  UNION ALL
-  SELECT ROWNUM TRANSACTIONS_COUNT FROM TRANSACTIONS  
-)
-SELECT C.TRANSACTIONS_COUNT, NVL(TV.VISITS_COUNT,0) VISITS_COUNT
-FROM TRANSACTIONS_VISITS_COUNT TV RIGHT JOIN  CONTINUOUS C
-ON TV.TRANSACTIONS_COUNT = C.TRANSACTIONS_COUNT
--- 篩選出比實際最大的交易次數還小的交易次數資料
-WHERE C.TRANSACTIONS_COUNT <= (SELECT MAX(TRANSACTIONS_COUNT) FROM TRANSACTIONS_VISITS_COUNT)
-ORDER BY C.TRANSACTIONS_COUNT;
-
--- MySQL
+-- 開啟CTE遞迴RECURSIVE查詢
 WITH RECURSIVE T1 AS(
+  -- 訪問資料表與交易資料表關聯，查詢每個日期的訪問次數和交易次數
   SELECT VISIT_DATE,
-    NVL(NUM_VISITS,0) NUM_VISITS,
-    NVL(NUM_TRANS,0) NUM_TRANS
-  FROM (    
+    IFNULL(NUM_VISITS,0) NUM_VISITS,
+    IFNULL(NUM_TRANS,0) NUM_TRANS
+  FROM (
+	-- VISITS訪問資料表每個訪問日的訪問次數
     SELECT VISIT_DATE, USER_ID, COUNT(USER_ID) AS NUM_VISITS      
     FROM VISITS
     GROUP BY VISIT_DATE, USER_ID
-  ) A LEFT JOIN (
+    ORDER BY VISIT_DATE
+  ) V LEFT JOIN (
+	-- TRANSACTIONS交易資料表每個交易日的交易次數
     SELECT TRANSACTION_DATE, USER_ID, COUNT(USER_ID) AS NUM_TRANS
     FROM TRANSACTIONS
     GROUP BY TRANSACTION_DATE, USER_ID
-  ) B ON A.VISIT_DATE = B.TRANSACTION_DATE  
-  AND A.USER_ID = B.USER_ID  
+  ) T ON V.VISIT_DATE = T.TRANSACTION_DATE  
+  AND V.USER_ID = T.USER_ID
 ),
 T2 AS (
-  SELECT MAX(NUM_TRANS) AS TRANS FROM T1
-  UNION ALL
-  SELECT TRANS-1 FROM T2 WHERE TRANS >= 1
+	-- 取得最高的交易次數(3次)
+	SELECT MAX(NUM_TRANS) AS TRANS FROM T1
+    -- 遞迴查詢T2最高的交易次數每次減1取得(2、1、0)
+    -- T2將產生一個0 ~ 3代表全部交易次數的資料表
+	UNION ALL
+	SELECT TRANS-1 FROM T2 WHERE TRANS >= 1
 )
-SELECT TRANS AS TRANSACTIONS_COUNT,
-  NVL(VISITS_COUNT,0) AS VISITS_COUNT
+-- 關聯回T2資料表對應(0次 ~ 3次)交易次數的每個訪問次數
+SELECT T2.TRANS AS TRANSACTIONS_COUNT,
+  IFNULL(T.VISITS_COUNT, 0) AS VISITS_COUNT
 FROM T2 LEFT JOIN (
+    -- 取得每個交易次數(0、1、3)與其對應的訪問數(4、5、1)
     SELECT NUM_TRANS AS TRANSACTIONS_COUNT,
-      NVL(COUNT(*),0) AS VISITS_COUNT
+      COUNT(NUM_VISITS) AS VISITS_COUNT
     FROM T1
     GROUP BY NUM_TRANS
     ORDER BY NUM_TRANS
-) A ON A.TRANSACTIONS_COUNT = T2.TRANS
+) T ON T2.TRANS = T.TRANSACTIONS_COUNT
 ORDER BY TRANS;
