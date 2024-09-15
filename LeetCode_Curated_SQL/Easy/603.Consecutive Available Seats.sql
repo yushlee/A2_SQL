@@ -6,6 +6,8 @@
 -- Can you help to query all the consecutive available seats order by the seat_id using the following cinema table?
 -- 使用以下 CINEMA TABLE 通過 seat_id 查詢所有"連續可用"的電影院座位順序？
 
+
+-- Table: Cinema
 -- | seat_id | free |
 -- |---------|------|
 -- | 1       | 1    |

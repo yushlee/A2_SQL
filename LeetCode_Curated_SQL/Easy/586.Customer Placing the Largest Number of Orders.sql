@@ -7,8 +7,8 @@
 -- It is guaranteed that exactly one customer will have placed more orders than any other customer.
 -- 可以確保恰好有一位客戶下的訂單比其他任何一位客戶都多。
 
+-- Table: Orders 
 -- The orders table is defined as follows:
-
 -- | Column            | Type      |
 -- |-------------------|-----------|
 -- | order_number (PK) | int       |

@@ -9,7 +9,6 @@
 
 -- Table: salesperson
 -- The table salesperson holds the salesperson information. Every salesperson has a sales_id and a name.
-
 -- +----------+------+--------+-----------------+-----------+
 -- | sales_id | name | salary | commission_rate | hire_date |
 -- +----------+------+--------+-----------------+-----------+
@@ -23,7 +22,6 @@
 
 -- Table: company
 -- The table company holds the company information. Every company has a com_id and a name.
-
 -- +---------+--------+------------+
 -- | com_id  |  name  |    city    |
 -- +---------+--------+------------+

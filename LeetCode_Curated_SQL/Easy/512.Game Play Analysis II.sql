@@ -5,7 +5,7 @@
 
 -- The query result format is in the following example:
 
--- Activity table:
+-- Table: Activity 
 -- +-----------+-----------+------------+--------------+
 -- | player_id | device_id | event_date | games_played |
 -- +-----------+-----------+------------+--------------+

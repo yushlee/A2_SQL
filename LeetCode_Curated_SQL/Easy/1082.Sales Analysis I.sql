@@ -1,7 +1,6 @@
 -- 1082.Sales Analysis I
 
 -- Table: Product
-
 -- +--------------+---------+
 -- | Column Name  | Type    |
 -- +--------------+---------+
@@ -12,7 +11,6 @@
 -- product_id is the primary key of this table.
 
 -- Table: Sales
-
 -- +-------------+---------+
 -- | Column Name | Type    |
 -- +-------------+---------+

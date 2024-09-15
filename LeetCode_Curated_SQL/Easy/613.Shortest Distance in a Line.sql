@@ -6,6 +6,7 @@
 -- Write a query to find the shortest distance between two points in these points.
 -- 編寫查詢以查找這些點中兩個點之間的最短距離
 
+-- Table: Point
 -- | x   |
 -- |-----|
 -- | -1  |

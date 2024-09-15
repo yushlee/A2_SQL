@@ -1,7 +1,6 @@
 -- 1113.Reported Posts
 
 -- Table: Actions
-
 -- +---------------+---------+
 -- | Column Name   | Type    |
 -- +---------------+---------+

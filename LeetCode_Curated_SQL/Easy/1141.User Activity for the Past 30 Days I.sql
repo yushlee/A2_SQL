@@ -2,7 +2,6 @@
 -- 使用者過去30天的活動紀錄
 
 -- Table: Activity
-
 -- +---------------+---------+
 -- | Column Name   | Type    |
 -- +---------------+---------+
@@ -49,15 +48,6 @@
 -- | 2019-07-21 | 2            |
 -- +------------+--------------+ 
 -- Note that we do not care about days with zero active users.
-
-
--- Oracle
-SELECT (TO_DATE('2019-07-27','YYYY-MM-DD') - 29) FROM DUAL;
-
-SELECT ACTIVITY_DATE AS DAY, COUNT(DISTINCT USER_ID) AS ACTIVE_USERS
-FROM ACTIVITY
-WHERE ACTIVITY_DATE BETWEEN (TO_DATE('2019-07-27','YYYY-MM-DD') - 29) AND '2019-07-27'
-GROUP BY ACTIVITY_DATE;
 
 
 -- MySQL
