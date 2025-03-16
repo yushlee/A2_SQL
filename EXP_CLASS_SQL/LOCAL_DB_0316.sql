@@ -77,10 +77,88 @@ WHERE STORE_NAME LIKE '%s%';
 -- 2.「且」營業額大於300(包含300)
 -- 3.「且」商店名稱“L”開頭
 -- 4.「或」營業日介於2018年3月至4月
-
 SELECT * FROM store_information
-WHERE GEOGRAPHY_ID = 2;
+WHERE GEOGRAPHY_ID = 2
+AND SALES >= 300
+AND STORE_NAME LIKE 'L%'
+OR STORE_DATE BETWEEN '2018-03-01' AND '2018-04-30';
 
 SELECT * FROM geography;
+
+-- 小到大:升幕 ASC(預設)
+-- 大到小:降幕 DESC
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+ORDER BY SALES ASC;
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+ORDER BY SALES DESC;
+
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+ORDER BY SALES DESC, STORE_DATE DESC;
+
+SELECT SUM(SALES), COUNT(STORE_ID), AVG(SALES),
+	MAX(SALES), MIN(SALES)
+FROM store_information;
+
+-- IS NULL 找出空值
+-- IS NOT NULL 找出非空值
+
+SELECT COUNT(STORE_ID)
+FROM store_information
+WHERE GEOGRAPHY_ID IS NULL;
+
+SELECT COUNT(STORE_ID)
+FROM store_information
+WHERE GEOGRAPHY_ID IS NOT NULL;
+
+SELECT COUNT(STORE_ID)
+FROM store_information
+WHERE SALES > 2000;
+
+-- 「去重覆」的「資料筆數」
+SELECT COUNT(DISTINCT STORE_NAME)
+FROM store_information;
+
+-- GROUP BY 資料分群，其它欄位則會資料合併
+-- 各別商店:加總、平均、個數、最大值、最小值
+-- 沒有在 GROUP BY 的欄位，必須使用聚合函數
+SELECT STORE_NAME, SUM(SALES), COUNT(STORE_ID), AVG(SALES),
+	MAX(SALES), MIN(SALES)
+FROM store_information
+GROUP BY STORE_NAME;
+
+
+-- GROUP BY 後面可以接續多欄位做資料分群
+SELECT STORE_NAME, SALES
+FROM store_information
+GROUP BY STORE_NAME, SALES;
+
+
+SELECT STORE_NAME, SUM(SALES), COUNT(STORE_ID), AVG(SALES)
+FROM store_information
+GROUP BY STORE_NAME
+HAVING SUM(SALES) >= 3000;
+
+-- SELECT -> FOMR -> WHERE -> GROUP BY -> HAVING -> ORDER BY
+SELECT STORE_NAME, SUM(SALES)
+FROM store_information
+WHERE GEOGRAPHY_ID = 2
+GROUP BY STORE_NAME
+HAVING SUM(SALES) > 0
+ORDER BY SUM(SALES) DESC;
+
+-- SQL 練習題(二)
+-- 計算和統計「個別商店」的以下三項資料：
+-- 「總合營業額」、「商店資料個數」、「平均營業額」
+-- 搜尋或排除條件如下：
+-- 排除「平均營業額」1000(含)以下的商店資料
+-- 排除「商店資料個數」1(含)個以下的商店資料
+-- 依照「平均營業額」由大至小排序
+
+
 
 
