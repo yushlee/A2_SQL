@@ -46,5 +46,41 @@ FROM store_information
 WHERE STORE_NAME IN ( 'Los Angeles', 'Boston');
 
 
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE SALES >= 300 AND SALES <= 2500;
+
+-- BETWEEN ... AND ...
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE SALES BETWEEN 300 AND 2500;
+
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE STORE_DATE BETWEEN  '2018-03-01' AND '2018-05-31';
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE STORE_NAME LIKE 'B%';
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE STORE_NAME LIKE '%s';
+
+SELECT STORE_ID, STORE_NAME, STORE_DATE, SALES
+FROM store_information
+WHERE STORE_NAME LIKE '%s%';
+
+-- SQL 練習題(一)
+-- 1.「且」找出屬於西區的商店
+-- 2.「且」營業額大於300(包含300)
+-- 3.「且」商店名稱“L”開頭
+-- 4.「或」營業日介於2018年3月至4月
+
+SELECT * FROM store_information
+WHERE GEOGRAPHY_ID = 2;
+
+SELECT * FROM geography;
 
 
