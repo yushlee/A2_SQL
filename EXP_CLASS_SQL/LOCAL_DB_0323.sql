@@ -76,9 +76,11 @@ WHERE S.GEOGRAPHY_ID IS NULL;
 -- 查詢各區域的營業額總計
 -- 資料結果依營業額總計由大到小排序
 -- (不論該區域底下是否有所屬商店)
-SELECT G.*, S.* 
+-- My NULL 函數 IFNULL()
+SELECT G.REGION_NAME, IFNULL(SUM(S.SALES), 0) "SUM_SALES"
 FROM geography G LEFT JOIN store_information S
 ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
-GROUP BY XXX
+GROUP BY G.REGION_NAME
+ORDER BY SUM_SALES DESC;
 
 
