@@ -22,20 +22,23 @@ SELECT S.*, G.*
 FROM store_information S, geography G
 WHERE S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 
-
--- JOIN ... ON
+-- 內部連接 (INNER JOIN)
+-- INNER JOIN ... ON (PS:INNER可省略)
 SELECT S.*, G.*
-FROM store_information S JOIN geography G
+FROM store_information S INNER JOIN geography G
+ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
+
+-- 左外部連接
+-- LEFT OUTER JOIN ... ON (PS:OUTER可省略)
+SELECT S.*, G.*
+FROM store_information S LEFT OUTER JOIN geography G
 ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 
 
+-- 右外部連接
+-- RITGHT OUTER JOIN ... ON (PS:OUTER可省略)
 SELECT S.*, G.*
-FROM store_information S LEFT JOIN geography G
-ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
-
-
-SELECT S.*, G.*
-FROM store_information S RIGHT JOIN geography G
+FROM store_information S RIGHT OUTER JOIN geography G
 ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 
 -- MySQL不支援FULL JOIN
@@ -43,12 +46,39 @@ ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 -- FROM store_information S FULL JOIN geography G
 -- ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID;
 
+-- 交叉連接(cross join)
 -- 商店9筆、區域3筆:27
 SELECT S.*, G.*
 FROM store_information S, geography G;
 
 
 
+SELECT S.*, G.*
+FROM store_information S LEFT OUTER JOIN geography G
+ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID
+WHERE  G.GEOGRAPHY_ID IS NULL;
 
+
+SELECT S.*, G.*
+FROM store_information S RIGHT OUTER JOIN geography G
+ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID
+WHERE S.GEOGRAPHY_ID IS NULL;
+
+
+-- SELECT S.*, G.*
+-- FROM store_information S FULL JOIN geography G
+-- ON S.GEOGRAPHY_ID = G.GEOGRAPHY_ID
+-- WHERE S.GEOGRAPHY_ID IS NULL 
+-- OR G.GEOGRAPHY_ID IS NULL;
+
+
+-- SQL 練習題(三)
+-- 查詢各區域的營業額總計
+-- 資料結果依營業額總計由大到小排序
+-- (不論該區域底下是否有所屬商店)
+SELECT G.*, S.* 
+FROM geography G LEFT JOIN store_information S
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+GROUP BY XXX
 
 
