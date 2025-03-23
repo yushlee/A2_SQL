@@ -84,4 +84,11 @@ ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 GROUP BY G.REGION_NAME
 ORDER BY SUM_SALES DESC;
 
+-- 查詢各區域的商店個數
+-- 資料結果依區域的商店個數由大至小排序
+-- (依據商店名稱,不包含重覆的商店)
+-- (不論該區域底下是否有所屬商店)
+SELECT G.*, S.*
+FROM geography G LEFT JOIN store_information S
+ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 
