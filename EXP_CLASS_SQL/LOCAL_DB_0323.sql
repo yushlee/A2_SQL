@@ -94,4 +94,13 @@ ON G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
 GROUP BY G.REGION_NAME
 ORDER BY COUNT_STORE DESC;
 
+SELECT * FROM store_information;
 
+-- 資料新增
+INSERT INTO store_information (STORE_ID, STORE_NAME, SALES, STORE_DATE, GEOGRAPHY_ID, OPEN_STATUS) VALUES(10, 'Apple store', 3600, '2018-07-07', 3, 1);
+
+-- 資料修改
+UPDATE store_information SET STORE_NAME = 'Apple Inc', SALES = 3700 WHERE STORE_ID = 10;
+
+-- 資料刪除
+DELETE FROM store_information WHERE STORE_ID = 10;
