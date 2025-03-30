@@ -172,7 +172,51 @@ SELECT S.* FROM S;
 
 
 --   SQL EXISTS 存在式關聯查詢
+
+-- EXISTS 是用來測試「內查詢」有沒有產生任何結果。
+-- 如果有的話，系統就會執行「外查詢」中的 SQL。
+-- 若是沒有的話，那整個 SQL 語句就不會產生任何結果。
+
+-- 外查詢
+SELECT * FROM store_information 
+WHERE EXISTS  (
+     -- 內查詢
+	SELECT * FROM geography WHERE GEOGRAPHY_ID = 1
+);
+
+-- 外查詢
+SELECT * FROM store_information 
+WHERE NOT EXISTS  (
+     -- 內查詢
+	SELECT * FROM geography WHERE GEOGRAPHY_ID = 1
+);
+
+-- 外查詢
+SELECT * FROM store_information S
+WHERE EXISTS  (
+     -- 內查詢
+	SELECT * FROM geography G 
+    WHERE G.GEOGRAPHY_ID = S.GEOGRAPHY_ID
+    AND G.GEOGRAPHY_ID = 1
+);
+
  --  SQL IF、CASE WHEN 條件式查詢
+SELECT STORE_ID, STORE_NAME, SALES, OPEN_STATUS,
+	IF(OPEN_STATUS = 1, 'OPEN', 'CLOSE') OPEN_STATUS
+ FROM store_information;
 
-
+-- CASE WHEN 後面只接條件
+SELECT STORE_ID, STORE_NAME, SALES,
+	CASE 
+		WHEN SALES BETWEEN 0 AND 500 THEN '0-500'
+		WHEN SALES BETWEEN 501 AND 1000 THEN '501-1000'
+        WHEN SALES BETWEEN 1001 AND 1500 THEN '1001-1500'
+        WHEN SALES BETWEEN 1501 AND 2000 THEN '1501-2000'
+        -- WHEN SALES > 2000 THEN '>2000'
+        ELSE '> 2000'
+     END 'RANGE_SALES'
+ FROM store_information
+ ORDER BY SALES;
+ 
+ -- CASE WHEN 後面接欄位與條件
 
